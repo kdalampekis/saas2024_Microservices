@@ -15,11 +15,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY ./Credit_Management_Service/requirements.txt /app/
+COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the Django project into the container
-COPY ./Credit_Management_Service/ /app/
+COPY .. /app/
 
 # Expose the port the app runs on
 EXPOSE 8000

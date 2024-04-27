@@ -78,10 +78,10 @@ import os
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'default_db_name'),
-        'USER': os.getenv('POSTGRES_USER', 'default_user'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'default_password'),
-        'HOST': 'problem-db',  # Use the service name defined in docker-compose.yml
+        'NAME': os.getenv('POSTGRES_DB', 'resultsdb'),
+        'USER': os.getenv('POSTGRES_USER', 'resultsdb'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
+        'HOST': 'results-db',  # Use the service name defined in docker-compose.yml
         'PORT': '5432',
     }
 }

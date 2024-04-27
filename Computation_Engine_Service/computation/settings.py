@@ -73,12 +73,14 @@ WSGI_APPLICATION = 'computation.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+import os
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'default_db_name'),
-        'USER': os.getenv('POSTGRES_USER', 'default_user'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'default_password'),
+        'NAME': os.getenv('POSTGRES_DB', 'computationdb'),
+        'USER': os.getenv('POSTGRES_USER', 'computationdb'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
         'HOST': 'computation-db',  # Use the service name defined in docker-compose.yml
         'PORT': '5432',
     }

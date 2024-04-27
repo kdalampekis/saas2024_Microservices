@@ -6,7 +6,11 @@ services:
     ports:
       - "8001:8000"
     environment:
-      - DATABASE_URL=postgres://userdb:password@user-db:5432/userdb
+      - POSTGRES_DB=userdb
+      - POSTGRES_USER=userdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - user-db
 
   user-db:
     image: postgres
@@ -22,7 +26,11 @@ services:
     ports:
       - "8002:8000"
     environment:
-      - DATABASE_URL=postgres://creditdb:password@credit-db:5432/creditdb
+      - POSTGRES_DB=creditdb
+      - POSTGRES_USER=creditdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - credit-db
 
   credit-db:
     image: postgres
@@ -38,7 +46,11 @@ services:
     ports:
       - "8003:8000"
     environment:
-      - DATABASE_URL=postgres://problemdb:password@user-db:5432/problemdb
+      - POSTGRES_DB=problemdb
+      - POSTGRES_USER=problemdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - problem-db
 
   problem-db:
     image: postgres
@@ -54,7 +66,11 @@ services:
     ports:
       - "8004:8000"
     environment:
-      - DATABASE_URL=postgres://computationdb:password@computation-db:5432/computationdb
+      - POSTGRES_DB=computationdb
+      - POSTGRES_USER=computationdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - computation-db
 
   computation-db:
     image: postgres
@@ -70,7 +86,11 @@ services:
     ports:
       - "8005:8000"
     environment:
-      - DATABASE_URL=postgres://resultsdb:password@results-db:5432/resultsdb
+      - POSTGRES_DB=resultsdb
+      - POSTGRES_USER=resultsdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - results-db
 
   results-db:
     image: postgres
@@ -86,7 +106,11 @@ services:
     ports:
       - "8006:8000"
     environment:
-      - DATABASE_URL=postgres://analyticsdb:password@analytics-db:5432/analyticsdb
+      - POSTGRES_DB=analyticsdb
+      - POSTGRES_USER=analyticsdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - analytics-db
 
   analytics-db:
     image: postgres
@@ -102,7 +126,11 @@ services:
     ports:
       - "8007:8000"
     environment:
-      - DATABASE_URL=postgres://authenticationdb:password@authentication-db:5432/authenticationdb
+      - POSTGRES_DB=authenticationdb
+      - POSTGRES_USER=authenticationdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - authentication-db
 
   authentication-db:
     image: postgres
@@ -112,6 +140,28 @@ services:
       - POSTGRES_DB=authenticationdb
       - POSTGRES_USER=authenticationdb
       - POSTGRES_PASSWORD=password
+
+
+  front-end:
+    build: ./front-end
+    ports:
+      - "8080:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://user-service:8001
+      - REACT_APP_BACKEND_URL=http://credit-service:8002
+      - REACT_APP_BACKEND_URL=http://problem-service:8003
+      - REACT_APP_BACKEND_URL=http://computation-service:8004
+      - REACT_APP_BACKEND_URL=http://results-service:8005
+      - REACT_APP_BACKEND_URL=http://analytics-service:8006
+      - REACT_APP_BACKEND_URL=http://authentication-service:8007
+#    depends_on:
+#      - user-service
+#      - credit-service
+#      - problem-service
+#      - computation-service
+#      - results-service
+#      - analytics-service
+#      - authentication-service
 
 volumes:
   user_data:
