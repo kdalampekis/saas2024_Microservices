@@ -1,56 +1,39 @@
 // src/LoginForm.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import '../index.css';
+import logo from '../../src/solveMe-Logo.png';
+import logo2 from '../../src/topLogo.png';
+import LoginGroup from './loginbuttons';
 
 function LoginForm() {
-    const [form, setForm] = useState({
-        username: '',
-        password: ''
-    });
+    const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
-    const handleChange = (event) => {
-        const { name, value } = event.target;
-        setForm(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
-    };
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentDateTime(new Date());
+        }, 1000);
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        console.log('Login Attempt:', form);
-        // Here you might send a request to the backend to validate user credentials
-    };
+        return () => {
+            clearInterval(timer);
+        };
+    }, []);
 
     return (
-        <div className="login-form">
-            <h1>Login</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>
-                        Username:
-                        <input
-                            type="text"
-                            name="username"
-                            value={form.username}
-                            onChange={handleChange}
-                            required
-                        />
-                    </label>
+        <div className="landing">
+            <img src={logo2} alt="solveMe Logo" className="top-logo"/>
+            <h1>Login!</h1>
+            <div className="top-section">
+                <div className="navigation-buttons">
+                    <Link to="/signup" className="btn btn-primary">Sign Up</Link>
+                    <Link to="/login" className="btn btn-secondary">Login</Link>
                 </div>
-                <div>
-                    <label>
-                        Password:
-                        <input
-                            type="password"
-                            name="password"
-                            value={form.password}
-                            onChange={handleChange}
-                            required
-                        />
-                    </label>
+                <div className="date-time-box">
+                    {currentDateTime.toLocaleDateString()} {currentDateTime.toLocaleTimeString()}
                 </div>
-                <button type="submit">Login</button>
-            </form>
+            </div> {/* This closes the .top-section div */}
+            <img src={logo} alt="solveMe Logo" className="center-logo"/>
+            <LoginGroup/>
         </div>
     );
 }
