@@ -1,5 +1,6 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from '../logo.svg';
+import '../App.css';
+import SignUpForm from './SignUpForm';  // Import the SignUpForm component
 
 function App() {
   return (
