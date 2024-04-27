@@ -38,7 +38,7 @@ services:
     ports:
       - "8003:8000"
     environment:
-      - DATABASE_URL=postgres://problemdb:password@problem-db:5432/problemdb
+      - DATABASE_URL=postgres://problemdb:password@user-db:5432/problemdb
 
   problem-db:
     image: postgres
