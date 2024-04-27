@@ -206,3 +206,93 @@ label {
   font-weight: bold;
 }
 
+/* Add these styles to your index.css file */
+
+.submissions-table {
+  margin: 1rem auto;
+  width: 90%;
+  border-collapse: collapse;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+}
+
+.submissions-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.submissions-table th,
+.submissions-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.submissions-table th {
+  background-color: #f4f4f4;
+  color: #333;
+  font-weight: bold;
+}
+
+.submissions-table tbody tr {
+  background-color: #636060; /* Light grey background */
+  transition: background-color 0.2s ease;
+}
+
+.submissions-table tbody tr:nth-child(even) {
+  background-color: #7c7b7b; /* Slightly darker grey for even rows */
+}
+
+.submissions-table tbody tr:hover {
+  background-color: #dfdfdf; /* Even lighter grey for hover */
+}
+
+.submissions-table button {
+  padding: 8px 16px;
+  margin-right: 4px;
+  border: none;
+  background-color: #5C6BC0;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submissions-table button:hover {
+  background-color: #3f51b5;
+}
+
+.submissions-table button:active {
+  transform: translateY(1px);
+}
+
+.submissions-table .delete-button {
+  background-color: #f44336;
+}
+
+.submissions-table .delete-button:hover {
+  background-color: #d32f2f;
+}
+
+
+.new-problem-button {
+  padding: 10px 20px;
+  margin-top: 15px; /* Adjust the margin as needed */
+  background-color: #4CAF50; /* A green color for the new problem button */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.new-problem-button:hover {
+  background-color: #45a049;
+}
+
+.new-problem-button:active {
+  transform: translateY(1px);
+}
+
+
+

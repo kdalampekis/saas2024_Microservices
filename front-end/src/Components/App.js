@@ -6,6 +6,7 @@ import LandingPage from './LandingPage';
 import SignUpForm from './SignUpForm';
 import LoginForm from './LoginForm';
 import Footer from './Footer';
+import MySubmissions from "./MySubmissions";
 
 function App() {
     return (
@@ -23,6 +24,9 @@ function App() {
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/signup" element={<SignUpForm />} />
                         <Route path="/login" element={<LoginForm />} />
+                        <Route path="/MySubmissions" element={<MySubmissions />} />
+                        <Route path="/mySubmissions" element={<MySubmissions username="UsernameHere" />} />
+                        <Route path="/MySubmissions" element={<MySubmissions />} />
                     </Routes>
                 </header>
                 <Footer />
