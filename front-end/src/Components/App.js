@@ -1,13 +1,34 @@
-import logo from '../logo.svg';
-import '../App.css';
-import SignUpForm from './SignUpForm';  // Import the SignUpForm component
+// src/Components/App.js
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import '../App.css'; // Make sure this path is correct
+import LandingPage from './LandingPage';
+import SignUpForm from './SignUpForm';
+import LoginForm from './LoginForm';
+import Footer from './Footer';
 
 function App() {
-  return (
-    <div className="App">
-      <SignUpForm />s
-    </div>
-  );
+    return (
+        <Router>
+            <div className="App">
+                <header className="App-header">
+                    {/*
+                    <nav>
+                        <Link to="/">Home</Link> |
+                        <Link to="/signup">Sign Up</Link> |
+                        <Link to="/login">Login</Link>
+                    </nav>
+                    */}
+                    <Routes>
+                        <Route path="/" element={<LandingPage />} />
+                        <Route path="/signup" element={<SignUpForm />} />
+                        <Route path="/login" element={<LoginForm />} />
+                    </Routes>
+                </header>
+                <Footer />
+            </div>
+        </Router>
+    );
 }
 
 export default App;

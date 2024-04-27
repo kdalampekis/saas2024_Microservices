@@ -1,13 +1,179 @@
+/* index.css */
 body {
   margin: 0;
+  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  monospace;
 }
+
+.App {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* This ensures the .App element takes up at least the full height of the viewport */
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+/* Landing Page Styles */
+.landing {
+  padding: 0;
+  width: 100%;
+}
+
+.landing h1 {
+  margin-bottom: 0.5em;
+}
+
+.navigation-buttons {
+  text-align: center;
+  margin-top: 20px; /* Keeps space above the buttons */
+  margin-bottom: 20px; /* Keeps space below the buttons */
+  margin-left: 0;
+  padding-left: 0;
+}
+
+
+.btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  text-decoration: none;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  margin-right: 10px;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #007bff; /*#6c757d;*/
+}
+
+.btn-secondary:hover {
+  background-color: #0056b3; /*#545b62;*/
+}
+
+.center-logo {
+  width: 50vw; /* This will set the width of the logo to be 50% of the viewport width */
+  max-width: 300px; /* You can also set a max-width to ensure it doesn't get too large on bigger screens */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+
+/* Make sure the .landing div is set to align items centrally */
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Take up full screen height */
+}
+
+.app-footer {
+  background-color: #282c34;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.App-content {
+  flex: 1; /* This will make the content grow to take available space, pushing the footer down */
+}
+
+.top-logo {
+  width: 70%; /* Sets the width to 70% of the viewport width */
+  height: 150px; /* Sets the height explicitly to 150px */
+  object-fit: cover;
+  display: block;
+  margin: 0 auto; /* Centers the logo within the containing element */
+  z-index: 1000;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Ensures padding does not affect the overall width of elements */
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden; /* Prevents horizontal scroll */
+}
+
+.top-section {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: calc(100% - 40px); /* Adjust width to account for the margins */
+  margin: 0 20px; /* Adds 20px margin to the left and right */
+}
+
+
+.date-time-box {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px; /* Adjust margin as needed */
+}
+
+.non-functional-btn {
+  padding: 10px 20px;
+  margin: 0 10px;
+  font-size: 16px;
+  background-color: #ccc;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.non-functional-btn:hover {
+  background-color: #bbb;
+}
+
+
+
+
+

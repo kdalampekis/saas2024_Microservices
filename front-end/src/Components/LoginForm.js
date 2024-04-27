@@ -1,14 +1,11 @@
-// src/Components/SignUpForm.js
+// src/LoginForm.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-function SignUpForm() {
+function LoginForm() {
     const [form, setForm] = useState({
         username: '',
-        email: '',
         password: ''
     });
-    const navigate = useNavigate(); // useNavigate replaces useHistory
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -20,13 +17,13 @@ function SignUpForm() {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log('User Registered:', form);
-        navigate('/login'); // navigate replaces history.push
+        console.log('Login Attempt:', form);
+        // Here you might send a request to the backend to validate user credentials
     };
 
     return (
-        <div className="sign-up-form">
-            <h1>Sign Up</h1>
+        <div className="login-form">
+            <h1>Login</h1>
             <form onSubmit={handleSubmit}>
                 <div>
                     <label>
@@ -36,17 +33,7 @@ function SignUpForm() {
                             name="username"
                             value={form.username}
                             onChange={handleChange}
-                        />
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Email:
-                        <input
-                            type="email"
-                            name="email"
-                            value={form.email}
-                            onChange={handleChange}
+                            required
                         />
                     </label>
                 </div>
@@ -58,13 +45,14 @@ function SignUpForm() {
                             name="password"
                             value={form.password}
                             onChange={handleChange}
+                            required
                         />
                     </label>
                 </div>
-                <button type="submit">Sign Up</button>
+                <button type="submit">Login</button>
             </form>
         </div>
     );
 }
 
-export default SignUpForm;
+export default LoginForm;
