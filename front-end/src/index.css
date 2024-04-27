@@ -294,5 +294,110 @@ label {
   transform: translateY(1px);
 }
 
+.model-search-input {
+  margin: 20px 0;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.solver-models-table {
+  margin: 0 auto;
+  width: 90%;
+  border-collapse: collapse;
+}
+
+.solver-models-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.solver-models-table th,
+.solver-models-table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.solver-models-table th {
+  background-color: #9e9a9a;
+  font-weight: normal;
+}
+
+.solver-models-table tbody tr {
+  background-color: #636060; /* Light grey background */
+  transition: background-color 0.2s ease;
+}
+
+.solver-models-table tbody tr:hover {
+  background-color: #dfdfdf; /* Even lighter grey for hover */
+}
+
+.model-dropdown {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px; /* Adjust as needed */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+
+/* Add to your index.css */
+
+.metadata-table,
+.input-data-table {
+  width: 100%;
+  margin: 20px 0;
+  border-collapse: collapse;
+}
+
+.metadata-table table,
+.input-data-table table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+}
+
+.metadata-table th,
+.input-data-table th,
+.metadata-table td,
+.input-data-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+.metadata-table th,
+.input-data-table th {
+  background-color: #f4f4f4;
+}
+
+.submission-form {
+  margin: 20px 0;
+}
+
+.submission-form h2 {
+  margin-bottom: 15px;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.form-buttons button {
+  padding: 10px 20px;
+  margin-right: 10px; /* For spacing between buttons */
+  border: none;
+  background-color: #5C6BC0;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Additional styles for button hover states */
 
 

@@ -7,6 +7,7 @@ import SignUpForm from './SignUpForm';
 import LoginForm from './LoginForm';
 import Footer from './Footer';
 import MySubmissions from "./MySubmissions";
+import NewSubmission from "./NewSubmission";
 
 function App() {
     return (
@@ -27,6 +28,7 @@ function App() {
                         <Route path="/MySubmissions" element={<MySubmissions />} />
                         <Route path="/mySubmissions" element={<MySubmissions username="UsernameHere" />} />
                         <Route path="/MySubmissions" element={<MySubmissions />} />
+                        <Route path="/NewSubmission" element={<NewSubmission />} />
                     </Routes>
                 </header>
                 <Footer />

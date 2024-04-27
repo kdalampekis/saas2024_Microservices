@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import '../index.css';
 import logo2 from '../../src/topLogo.png';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function MySubmissions() {
     const location = useLocation();
+    const navigate = useNavigate();
     const username = location.state?.username;
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
@@ -26,9 +27,8 @@ function MySubmissions() {
     ];
 
     // Add any functionality for when the "New Problem" button is clicked
-    const handleNewProblemClick = () => {
-        // Implement your logic here, like navigating to a form or another page
-        console.log('New Problem button clicked');
+    const handleNewClick = () => {
+        navigate('/NewSubmission', { state: { username: username } }); // Navigate and pass username
     };
 
     return (
@@ -78,7 +78,7 @@ function MySubmissions() {
                 </table>
 
             </div>
-            <button className="new-problem-button" onClick={handleNewProblemClick}>
+            <button className="new-problem-button" onClick={handleNewClick}>
                 New Problem
             </button>
         </div>
