@@ -1,18 +1,123 @@
 version: '3.8'
 
 services:
-  backend:
-    build: ./backend
-    volumes:
-      - ./backend:/code
+  user-service:
+    build: ./user-service
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment:
-      - DEBUG=0
+      - DATABASE_URL=postgres://userdb:password@user-db:5432/userdb
 
-  frontend:
-    build: ./frontend
+  user-db:
+    image: postgres
     volumes:
-      - ./frontend:/app
+      - user_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=userdb
+      - POSTGRES_USER=userdb
+      - POSTGRES_PASSWORD=password
+
+  credit-service:
+    build: ./credit-service
     ports:
-      - "3000:3000"
+      - "8002:8000"
+    environment:
+      - DATABASE_URL=postgres://creditdb:password@credit-db:5432/creditdb
+
+  credit-db:
+    image: postgres
+    volumes:
+      - credit_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=creditdb
+      - POSTGRES_USER=creditdb
+      - POSTGRES_PASSWORD=password
+
+  problem-service:
+    build: ./problem-service
+    ports:
+      - "8003:8000"
+    environment:
+      - DATABASE_URL=postgres://problemdb:password@problem-db:5432/problemdb
+
+  problem-db:
+    image: postgres
+    volumes:
+      - problem_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=problemdb
+      - POSTGRES_USER=problemdb
+      - POSTGRES_PASSWORD=password
+
+  computation-service:
+    build: ./computation-service
+    ports:
+      - "8004:8000"
+    environment:
+      - DATABASE_URL=postgres://computationdb:password@computation-db:5432/computationdb
+
+  computation-db:
+    image: postgres
+    volumes:
+      - computation_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=computationdb
+      - POSTGRES_USER=computationdb
+      - POSTGRES_PASSWORD=password
+
+  results-service:
+    build: ./results-service
+    ports:
+      - "8005:8000"
+    environment:
+      - DATABASE_URL=postgres://resultsdb:password@results-db:5432/resultsdb
+
+  results-db:
+    image: postgres
+    volumes:
+      - results_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=resultsdb
+      - POSTGRES_USER=resultsdb
+      - POSTGRES_PASSWORD=password
+
+  analytics-service:
+    build: ./analytics-service
+    ports:
+      - "8006:8000"
+    environment:
+      - DATABASE_URL=postgres://analyticsdb:password@analytics-db:5432/analyticsdb
+
+  analytics-db:
+    image: postgres
+    volumes:
+      - analytics_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=analyticsdb
+      - POSTGRES_USER=analyticsdb
+      - POSTGRES_PASSWORD=password
+
+  authentication-service:
+    build: ./authentication-service
+    ports:
+      - "8007:8000"
+    environment:
+      - DATABASE_URL=postgres://authenticationdb:password@authentication-db:5432/authenticationdb
+
+  authentication-db:
+    image: postgres
+    volumes:
+      - authentication_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=authenticationdb
+      - POSTGRES_USER=authenticationdb
+      - POSTGRES_PASSWORD=password
+
+volumes:
+  user_data:
+  credit_data:
+  problem_data:
+  computation_data:
+  results_data:
+  analytics_data:
+  authentication_data:
