@@ -5,13 +5,13 @@ FROM node:16-alpine
 WORKDIR /app
 
 # Copy package.json and package-lock.json (or yarn.lock) from the front-end subdirectory
-COPY front-end/package.json front-end/package-lock.json ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy the rest of the application code from the front-end subdirectory
-COPY front-end/ ./
+COPY . .
 
 # Expose port 3000 for the application
 EXPOSE 3000
