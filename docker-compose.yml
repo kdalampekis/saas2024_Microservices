@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   user-service:
-    build: ./user-service
+    build: ./User_Management_Service
     ports:
       - "8001:8000"
     environment:
@@ -18,7 +18,7 @@ services:
       - POSTGRES_PASSWORD=password
 
   credit-service:
-    build: ./credit-service
+    build: ./Credit_Management_Service
     ports:
       - "8002:8000"
     environment:
@@ -34,7 +34,7 @@ services:
       - POSTGRES_PASSWORD=password
 
   problem-service:
-    build: ./problem-service
+    build: ./Problem_Submission_Service
     ports:
       - "8003:8000"
     environment:
@@ -50,7 +50,7 @@ services:
       - POSTGRES_PASSWORD=password
 
   computation-service:
-    build: ./computation-service
+    build: ./Computation_Engine_Service
     ports:
       - "8004:8000"
     environment:
@@ -66,7 +66,7 @@ services:
       - POSTGRES_PASSWORD=password
 
   results-service:
-    build: ./results-service
+    build: ./Results_Management_Service
     ports:
       - "8005:8000"
     environment:
@@ -82,7 +82,7 @@ services:
       - POSTGRES_PASSWORD=password
 
   analytics-service:
-    build: ./analytics-service
+    build: ./Analytics_Logging_Service
     ports:
       - "8006:8000"
     environment:
@@ -98,7 +98,7 @@ services:
       - POSTGRES_PASSWORD=password
 
   authentication-service:
-    build: ./authentication-service
+    build: ./Authentication_Service
     ports:
       - "8007:8000"
     environment:
