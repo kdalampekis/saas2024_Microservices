@@ -8,11 +8,11 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 
 # Assuming each service has its own requirements.txt
-COPY Analytics_Logging_Service/requirements.txt ./
+COPY requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the Django project directory
-COPY Analytics_Logging_Service/ ./
+COPY .. /app/
 
 # Run the application
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
