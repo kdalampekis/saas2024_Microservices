@@ -16,7 +16,7 @@ function App() {
                 <header className="App-header">
                     {/*
                     <nav>
-                        <Link to="/">Home</Link> |
+                        <Link to="/">Home Alone</Link> |
                         <Link to="/signup">Sign Up</Link> |
                         <Link to="/login">Login</Link>
                     </nav>
