@@ -131,6 +131,9 @@ services:
       - POSTGRES_PASSWORD=password
     depends_on:
       - authentication-db
+    networks:
+      - app-network
+
 
   authentication-db:
     image: postgres
@@ -140,6 +143,10 @@ services:
       - POSTGRES_DB=authenticationdb
       - POSTGRES_USER=authenticationdb
       - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"  # Expose port 5432 on the host, connected to port 5432 in the container
+    networks:
+      - app-network
 
 
   front-end:
@@ -171,3 +178,7 @@ volumes:
   results_data:
   analytics_data:
   authentication_data:
+
+networks:
+  app-network:
+    driver: bridge
