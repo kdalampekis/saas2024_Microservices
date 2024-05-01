@@ -1,13 +1,403 @@
+/* index.css */
 body {
   margin: 0;
+  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  monospace;
 }
+
+.App {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* This ensures the .App element takes up at least the full height of the viewport */
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+/* Landing Page Styles */
+.landing {
+  padding: 0;
+  width: 100%;
+}
+
+.landing h1 {
+  margin-bottom: 0.5em;
+}
+
+.navigation-buttons {
+  text-align: center;
+  margin-top: 20px; /* Keeps space above the buttons */
+  margin-bottom: 20px; /* Keeps space below the buttons */
+  margin-left: 0;
+  padding-left: 0;
+}
+
+
+.btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  text-decoration: none;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  margin-right: 10px;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  margin-top: 20px;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #007bff; /*#6c757d;*/
+}
+
+.btn-secondary:hover {
+  background-color: #0056b3; /*#545b62;*/
+}
+
+.center-logo {
+  width: 50vw; /* This will set the width of the logo to be 50% of the viewport width */
+  max-width: 300px; /* You can also set a max-width to ensure it doesn't get too large on bigger screens */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+
+/* Make sure the .landing div is set to align items centrally */
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /*height: 100vh; /* Take up full screen height */
+}
+
+.app-footer {
+  background-color: #282c34;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.App-content {
+  flex: 1; /* This will make the content grow to take available space, pushing the footer down */
+}
+
+.top-logo {
+  width: 70%; /* Sets the width to 70% of the viewport width */
+  height: 150px; /* Sets the height explicitly to 150px */
+  object-fit: cover;
+  display: block;
+  margin: 0 auto; /* Centers the logo within the containing element */
+  z-index: 1000;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* Ensures padding does not affect the overall width of elements */
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden; /* Prevents horizontal scroll */
+}
+
+.top-section {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: calc(100% - 40px); /* Adjust width to account for the margins */
+  margin: 0 20px; /* Adds 20px margin to the left and right */
+}
+
+
+.date-time-box {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px; /* Adjust margin as needed */
+}
+
+.non-functional-btn {
+  padding: 10px 20px;
+  margin: 0 10px;
+  font-size: 16px;
+  background-color: #ccc;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.non-functional-btn:hover {
+  background-color: #bbb;
+}
+
+/* Adjust the maximum height of the form container */
+.login-group {
+  margin-top: 20px;
+  max-height: calc(100vh - 400px); /* Set maximum height to allow scrolling */
+  margin-bottom: 20px;
+}
+
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(249, 249, 249, 0.9); /* Transparent background color */
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group label {
+  color: #007bff; /* Dark blue color */
+}
+
+label {
+  font-weight: bold;
+}
+
+/* Add these styles to your index.css file */
+
+.submissions-table {
+  margin: 1rem auto;
+  width: 90%;
+  border-collapse: collapse;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+}
+
+.submissions-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.submissions-table th,
+.submissions-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.submissions-table th {
+  background-color: #f4f4f4;
+  color: #333;
+  font-weight: bold;
+}
+
+.submissions-table tbody tr {
+  background-color: #636060; /* Light grey background */
+  transition: background-color 0.2s ease;
+}
+
+.submissions-table tbody tr:nth-child(even) {
+  background-color: #7c7b7b; /* Slightly darker grey for even rows */
+}
+
+.submissions-table tbody tr:hover {
+  background-color: #dfdfdf; /* Even lighter grey for hover */
+}
+
+.submissions-table button {
+  padding: 8px 16px;
+  margin-right: 4px;
+  border: none;
+  background-color: #5C6BC0;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submissions-table button:hover {
+  background-color: #3f51b5;
+}
+
+.submissions-table button:active {
+  transform: translateY(1px);
+}
+
+.submissions-table .delete-button {
+  background-color: #f44336;
+}
+
+.submissions-table .delete-button:hover {
+  background-color: #d32f2f;
+}
+
+
+.new-problem-button {
+  padding: 10px 20px;
+  margin-top: 15px; /* Adjust the margin as needed */
+  background-color: #4CAF50; /* A green color for the new problem button */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.new-problem-button:hover {
+  background-color: #45a049;
+}
+
+.new-problem-button:active {
+  transform: translateY(1px);
+}
+
+.model-search-input {
+  margin: 20px 0;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.solver-models-table {
+  margin: 0 auto;
+  width: 90%;
+  border-collapse: collapse;
+}
+
+.solver-models-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.solver-models-table th,
+.solver-models-table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.solver-models-table th {
+  background-color: #9e9a9a;
+  font-weight: normal;
+}
+
+.solver-models-table tbody tr {
+  background-color: #636060; /* Light grey background */
+  transition: background-color 0.2s ease;
+}
+
+.solver-models-table tbody tr:hover {
+  background-color: #dfdfdf; /* Even lighter grey for hover */
+}
+
+.model-dropdown {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px; /* Adjust as needed */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+
+/* Add to your index.css */
+
+.metadata-table,
+.input-data-table {
+  width: 100%;
+  margin: 20px 0;
+  border-collapse: collapse;
+}
+
+.metadata-table table,
+.input-data-table table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+}
+
+.metadata-table th,
+.input-data-table th,
+.metadata-table td,
+.input-data-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+.metadata-table th,
+.input-data-table th {
+  background-color: #f4f4f4;
+}
+
+.submission-form {
+  margin: 20px 0;
+}
+
+.submission-form h2 {
+  margin-bottom: 15px;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.form-buttons button {
+  padding: 10px 20px;
+  margin-right: 10px; /* For spacing between buttons */
+  border: none;
+  background-color: #5C6BC0;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Additional styles for button hover states */
+
+

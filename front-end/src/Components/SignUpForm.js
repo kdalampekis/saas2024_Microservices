@@ -1,5 +1,6 @@
-// src/SignUpForm.js
+// src/Components/SignUpForm.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function SignUpForm() {
     const [form, setForm] = useState({
@@ -7,6 +8,7 @@ function SignUpForm() {
         email: '',
         password: ''
     });
+    const navigate = useNavigate(); // useNavigate replaces useHistory
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -19,7 +21,7 @@ function SignUpForm() {
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log('User Registered:', form);
-        // Add your API call or logic to handle submission here
+        navigate('/login'); // navigate replaces history.push
     };
 
     return (
