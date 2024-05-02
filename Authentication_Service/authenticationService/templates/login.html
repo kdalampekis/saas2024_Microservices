@@ -6,7 +6,7 @@
     <title>Login Page</title>
 </head>
 <body>
-<form method="post" action="login/">
+<form method="post" action="{% url 'login' %}">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required><br><br>
 

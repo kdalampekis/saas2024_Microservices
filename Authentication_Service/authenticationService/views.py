@@ -19,9 +19,16 @@ class LoginApiView(APIView):
                 'token': token.key,
                 'is_superuser': user.is_superuser
             }
-            return Response(response_data)
+            # return Response(response_data)
+            return redirect("main/")
         else:
             return Response({"error": "Invalid credentials"}, status=400)
 
     def get(self, request, *args, **kwargs):
         return render(request, "login.html")
+    
+    
+    
+class MainView(APIView):
+    def get(self, request, *args, **kwargs):
+        return render(request, "main.html")

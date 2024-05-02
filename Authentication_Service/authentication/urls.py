@@ -21,4 +21,5 @@ from authenticationService.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', LoginApiView.as_view(), name="login"),
+    path('main/', MainView.as_view(), name="main"),
 ]
