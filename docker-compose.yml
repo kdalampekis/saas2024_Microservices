@@ -130,7 +130,8 @@ services:
       - POSTGRES_USER=authenticationdb
       - POSTGRES_PASSWORD=password
     depends_on:
-      - authentication-db
+      authentication-db:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -147,6 +148,12 @@ services:
       - "5432:5432"  # Expose port 5432 on the host, connected to port 5432 in the container
     networks:
       - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U authenticationdb -d authenticationdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 
 
   front-end:
