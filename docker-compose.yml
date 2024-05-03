@@ -1,0 +1,191 @@
+version: '3.8'
+
+services:
+  user-service:
+    build: ./User_Management_Service
+    ports:
+      - "8001:8000"
+    environment:
+      - POSTGRES_DB=userdb
+      - POSTGRES_USER=userdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - user-db
+
+  user-db:
+    image: postgres
+    volumes:
+      - user_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=userdb
+      - POSTGRES_USER=userdb
+      - POSTGRES_PASSWORD=password
+
+  credit-service:
+    build: ./Credit_Management_Service
+    ports:
+      - "8002:8000"
+    environment:
+      - POSTGRES_DB=creditdb
+      - POSTGRES_USER=creditdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - credit-db
+
+  credit-db:
+    image: postgres
+    volumes:
+      - credit_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=creditdb
+      - POSTGRES_USER=creditdb
+      - POSTGRES_PASSWORD=password
+
+  problem-service:
+    build: ./Problem_Submission_Service
+    ports:
+      - "8003:8000"
+    environment:
+      - POSTGRES_DB=problemdb
+      - POSTGRES_USER=problemdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - problem-db
+
+  problem-db:
+    image: postgres
+    volumes:
+      - problem_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=problemdb
+      - POSTGRES_USER=problemdb
+      - POSTGRES_PASSWORD=password
+
+  computation-service:
+    build: ./Computation_Engine_Service
+    ports:
+      - "8004:8000"
+    environment:
+      - POSTGRES_DB=computationdb
+      - POSTGRES_USER=computationdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - computation-db
+
+  computation-db:
+    image: postgres
+    volumes:
+      - computation_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=computationdb
+      - POSTGRES_USER=computationdb
+      - POSTGRES_PASSWORD=password
+
+  results-service:
+    build: ./Results_Management_Service
+    ports:
+      - "8005:8000"
+    environment:
+      - POSTGRES_DB=resultsdb
+      - POSTGRES_USER=resultsdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - results-db
+
+  results-db:
+    image: postgres
+    volumes:
+      - results_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=resultsdb
+      - POSTGRES_USER=resultsdb
+      - POSTGRES_PASSWORD=password
+
+  analytics-service:
+    build: ./Analytics_Logging_Service
+    ports:
+      - "8006:8000"
+    environment:
+      - POSTGRES_DB=analyticsdb
+      - POSTGRES_USER=analyticsdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      - analytics-db
+
+  analytics-db:
+    image: postgres
+    volumes:
+      - analytics_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=analyticsdb
+      - POSTGRES_USER=analyticsdb
+      - POSTGRES_PASSWORD=password
+
+  authentication-service:
+    build: ./Authentication_Service
+    ports:
+      - "8007:8000"
+    environment:
+      - POSTGRES_DB=authenticationdb
+      - POSTGRES_USER=authenticationdb
+      - POSTGRES_PASSWORD=password
+    depends_on:
+      authentication-db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+
+  authentication-db:
+    image: postgres
+    volumes:
+      - authentication_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=authenticationdb
+      - POSTGRES_USER=authenticationdb
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"  # Expose port 5432 on the host, connected to port 5432 in the container
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U authenticationdb -d authenticationdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+
+  front-end:
+    build: ./front-end
+    ports:
+      - "8080:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://user-service:8001
+      - REACT_APP_BACKEND_URL=http://credit-service:8002
+      - REACT_APP_BACKEND_URL=http://problem-service:8003
+      - REACT_APP_BACKEND_URL=http://computation-service:8004
+      - REACT_APP_BACKEND_URL=http://results-service:8005
+      - REACT_APP_BACKEND_URL=http://analytics-service:8006
+      - REACT_APP_BACKEND_URL=http://authentication-service:8007
+#    depends_on:
+#      - user-service
+#      - credit-service
+#      - problem-service
+#      - computation-service
+#      - results-service
+#      - analytics-service
+#      - authentication-service
+
+volumes:
+  user_data:
+  credit_data:
+  problem_data:
+  computation_data:
+  results_data:
+  analytics_data:
+  authentication_data:
+
+networks:
+  app-network:
+    driver: bridge
