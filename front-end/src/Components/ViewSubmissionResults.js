@@ -43,10 +43,24 @@ function ViewSubmissionResults() {
                     {currentDateTime.toLocaleDateString()} {currentDateTime.toLocaleTimeString()}
                 </div>
             </div>
-
-            <div className="metadata-table">
+            <div className="submissions-table">
                 <table>
                     <thead>
+                    <tr>
+                        <th>submission id</th>
+                        <th>submission name</th>
+                        <th>creator</th>
+                        <th>solver id, executed on</th>
+                    </tr>
+                    </thead>
+
+                </table>
+            </div>
+
+            <div className="submissions-table">
+                <table>
+                    <thead>
+                    <td>Metadata</td>
                     <tr>
                         <th>Name</th>
                         <th>Description</th>
@@ -65,6 +79,31 @@ function ViewSubmissionResults() {
                 </table>
 
             </div>
+
+            <div className="submissions-table">
+                <table>
+                    <thead>
+                    <td>Results</td>
+                    <tr>
+                        <th>Dataset id</th>
+                        <th>Dataset Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div className="button-group">
+                <button className="non-functional-btn">DNL excel</button>
+                <button className="non-functional-btn">NND raw</button>
+                <button className="non-functional-btn">Return</button>
+            </div>
+
+
         </div>
     );
 }
