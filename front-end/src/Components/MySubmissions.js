@@ -50,7 +50,7 @@ function MySubmissions() {
                         <th>Name</th>
                         <th>Created On</th>
                         <th>Status</th>
-                        <th colSpan="3">Actions</th>
+                        <th colSpan="4">Actions</th>
                     </tr>
                     </thead>
                     <tbody>
