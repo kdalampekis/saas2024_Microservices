@@ -222,8 +222,8 @@ label {
 
 .submissions-table th,
 .submissions-table td {
-  padding: 12px 15px;
-  text-align: left;
+  padding: 8px 15px;
+  text-align: center;
   border-bottom: 1px solid #ddd;
 }
 
@@ -273,6 +273,11 @@ label {
   background-color: #d32f2f;
 }
 
+.drop-area {
+  border: 2px dashed #ccc;
+  padding: 20px;
+  color: #666;
+}
 
 .new-problem-button {
   padding: 10px 20px;

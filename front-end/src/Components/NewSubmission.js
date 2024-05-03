@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import {Link, useLocation} from 'react-router-dom';
 import '../index.css';
 import logo2 from '../../src/topLogo.png';
 
@@ -114,7 +114,7 @@ function NewSubmission() {
                     Upload submission metadata
                 </button>
                 <div className="form-buttons3">
-                    <button className="create-button">Create</button>
+                    <Link to="/EditSubmission" className="create-button">Create</Link>
                     <button className="cancel-button">Cancel</button>
                 </div>
             </div>
