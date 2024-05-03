@@ -8,6 +8,8 @@ import LoginForm from './LoginForm';
 import Footer from './Footer';
 import MySubmissions from "./MySubmissions";
 import NewSubmission from "./NewSubmission";
+import AllSubmissions from "./AllSubmissions";
+import ViewSubmissionResults from "./ViewSubmissionResults";
 
 function App() {
     return (
@@ -29,6 +31,8 @@ function App() {
                         <Route path="/mySubmissions" element={<MySubmissions username="UsernameHere" />} />
                         <Route path="/MySubmissions" element={<MySubmissions />} />
                         <Route path="/NewSubmission" element={<NewSubmission />} />
+                        <Route path="/AllSubmissions" element={<AllSubmissions />} />
+                        <Route path="/ViewSubmissionResults" element={<ViewSubmissionResults />} />
                     </Routes>
                 </header>
                 <Footer />
