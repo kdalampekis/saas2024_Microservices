@@ -3,7 +3,7 @@ import '../index.css';
 import logo2 from '../../src/topLogo.png';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-function MySubmissions() {
+function ViewSubmissionResults() {
     const location = useLocation();
     const navigate = useNavigate();
     const username = location.state?.username;
@@ -21,8 +21,8 @@ function MySubmissions() {
 
     // Example data for the table
     const submissions = [
-        { name: 'Submission 1', createdOn: 'Date 1', status: 'ready' },
-        { name: 'Submission 2', createdOn: 'Date 2', status: 'not ready' },
+        { name:"I AM", description: "he wanted to be HIM", value: "1000$" },
+        { name:"I AM NOT", description: "he did not want to be HIM", value: "2500$" },
         // ... other submissions
     ];
 
@@ -34,10 +34,10 @@ function MySubmissions() {
     return (
         <div className="landing">
             <img src={logo2} alt="solveMe Logo" className="top-logo"/>
-            <h1>My Submissions</h1>
+            <h1>View Submission Results</h1>
             <div className="top-section">
                 <div className="username-display">
-                    <strong>Welcome, {username || 'Guest'}</strong>
+                    <strong>status(username,company,account status, logout)</strong>
                 </div>
                 <div className="date-time-box">
                     {currentDateTime.toLocaleDateString()} {currentDateTime.toLocaleTimeString()}
@@ -47,42 +47,65 @@ function MySubmissions() {
                 <table>
                     <thead>
                     <tr>
+                        <th>submission id</th>
+                        <th>submission name</th>
+                        <th>creator</th>
+                        <th>solver id, executed on</th>
+                    </tr>
+                    </thead>
+
+                </table>
+            </div>
+
+            <div className="submissions-table">
+                <table>
+                    <thead>
+                    <td>Metadata</td>
+                    <tr>
                         <th>Name</th>
-                        <th>Created On</th>
-                        <th>Status</th>
-                        <th colSpan="4">Actions</th>
+                        <th>Description</th>
+                        <th>Value</th>
                     </tr>
                     </thead>
                     <tbody>
                     {submissions.map((submission, index) => (
                         <tr key={index}>
                             <td>{submission.name}</td>
-                            <td>{submission.createdOn}</td>
-                            <td>{submission.status}</td>
-                            <td>
-                                <button>View/Edit</button>
-                            </td>
-                            <td>
-                                <button>Run</button>
-                            </td>
-                            <td>
-                                <button>View Results</button>
-                            </td>
-                            <td>
-                                <button className="delete-button">Delete</button>
-                            </td>
-
+                            <td>{submission.description}</td>
+                            <td>{submission.value}</td>
                         </tr>
                     ))}
                     </tbody>
                 </table>
 
             </div>
-            <button className="new-problem-button" onClick={handleNewClick}>
-                New Problem
-            </button>
+
+            <div className="submissions-table">
+                <table>
+                    <thead>
+                    <td>Results</td>
+                    <tr>
+                        <th>Dataset id</th>
+                        <th>Dataset Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div className="button-group">
+                <button className="non-functional-btn">DNL excel</button>
+                <button className="non-functional-btn">NND raw</button>
+                <button className="non-functional-btn">Return</button>
+            </div>
+
+
         </div>
     );
 }
 
-export default MySubmissions;
+export default ViewSubmissionResults;

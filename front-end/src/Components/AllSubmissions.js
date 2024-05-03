@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import '../index.css';
 import logo2 from '../../src/topLogo.png';
-import { useLocation, useNavigate } from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 
-function MySubmissions() {
+function AllSubmissions() {
     const location = useLocation();
     const navigate = useNavigate();
     const username = location.state?.username;
@@ -21,8 +21,8 @@ function MySubmissions() {
 
     // Example data for the table
     const submissions = [
-        { name: 'Submission 1', createdOn: 'Date 1', status: 'ready' },
-        { name: 'Submission 2', createdOn: 'Date 2', status: 'not ready' },
+        { creator: 'Submission 1', name: 'bobmarley', createdOn: 'Date 1', status: 'ready' },
+        { creator: 'Submission 2', name: 'My glorious king', createdOn: 'Date 2', status: 'not ready' },
         // ... other submissions
     ];
 
@@ -34,10 +34,10 @@ function MySubmissions() {
     return (
         <div className="landing">
             <img src={logo2} alt="solveMe Logo" className="top-logo"/>
-            <h1>My Submissions</h1>
+            <h1>All Submissions</h1>
             <div className="top-section">
                 <div className="username-display">
-                    <strong>Welcome, {username || 'Guest'}</strong>
+                    <strong>Activity</strong>
                 </div>
                 <div className="date-time-box">
                     {currentDateTime.toLocaleDateString()} {currentDateTime.toLocaleTimeString()}
@@ -47,8 +47,9 @@ function MySubmissions() {
                 <table>
                     <thead>
                     <tr>
+                        <th>Creator</th>
                         <th>Name</th>
-                        <th>Created On</th>
+                        <th>CreatedOn</th>
                         <th>Status</th>
                         <th colSpan="4">Actions</th>
                     </tr>
@@ -56,6 +57,7 @@ function MySubmissions() {
                     <tbody>
                     {submissions.map((submission, index) => (
                         <tr key={index}>
+                            <td>{submission.creator}</td>
                             <td>{submission.name}</td>
                             <td>{submission.createdOn}</td>
                             <td>{submission.status}</td>
@@ -66,7 +68,7 @@ function MySubmissions() {
                                 <button>Run</button>
                             </td>
                             <td>
-                                <button>View Results</button>
+                                <Link to="/ViewSubmissionResults" className="btn btn-secondary">View Results</Link>
                             </td>
                             <td>
                                 <button className="delete-button">Delete</button>
@@ -78,11 +80,8 @@ function MySubmissions() {
                 </table>
 
             </div>
-            <button className="new-problem-button" onClick={handleNewClick}>
-                New Problem
-            </button>
         </div>
     );
 }
 
-export default MySubmissions;
+export default AllSubmissions;

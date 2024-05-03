@@ -8,7 +8,9 @@ import LoginForm from './LoginForm';
 import Footer from './Footer';
 import MySubmissions from "./MySubmissions";
 import NewSubmission from "./NewSubmission";
-
+import AllSubmissions from "./AllSubmissions";
+import ViewSubmissionResults from "./ViewSubmissionResults";
+import EditSubmission from "./EditSubmission";
 function App() {
     return (
         <Router>
@@ -16,7 +18,7 @@ function App() {
                 <header className="App-header">
                     {/*
                     <nav>
-                        <Link to="/">Home</Link> |
+                        <Link to="/">Home Alone</Link> |
                         <Link to="/signup">Sign Up</Link> |
                         <Link to="/login">Login</Link>
                     </nav>
@@ -29,6 +31,9 @@ function App() {
                         <Route path="/mySubmissions" element={<MySubmissions username="UsernameHere" />} />
                         <Route path="/MySubmissions" element={<MySubmissions />} />
                         <Route path="/NewSubmission" element={<NewSubmission />} />
+                        <Route path="/AllSubmissions" element={<AllSubmissions />} />
+                        <Route path="/ViewSubmissionResults" element={<ViewSubmissionResults />} />
+                        <Route path="/EditSubmission" element={<EditSubmission />} />
                     </Routes>
                 </header>
                 <Footer />

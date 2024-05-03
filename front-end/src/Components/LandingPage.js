@@ -27,6 +27,7 @@ function LandingPage() {
                 <div className="navigation-buttons">
                     <Link to="/signup" className="btn btn-primary">Sign Up</Link>
                     <Link to="/login" className="btn btn-secondary">Login</Link>
+                    <Link to="/AllSubmissions" className="btn btn-secondary">Admin</Link>
                 </div>
                 <div className="date-time-box">
                     {currentDateTime.toLocaleDateString()} {currentDateTime.toLocaleTimeString()}
