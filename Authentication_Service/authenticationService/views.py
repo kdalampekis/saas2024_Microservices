@@ -4,12 +4,12 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status, generics
+from rest_framework.permissions import AllowAny
+from django.contrib.auth.models import User
 
-# from rest_framework.renderers import JSONRenderer
+
 
 class LoginApiView(APIView):
-#     renderer_classes = [JSONRenderer]
-
     def post(self, request, *args, **kwargs):
         print("post called")
 #         print("Request data:", request.data)
@@ -26,16 +26,61 @@ class LoginApiView(APIView):
                 'is_superuser': user.is_superuser
             }
             return Response(response_data)
-#             return redirect("main")
+#             return redirect("/logout")
         else:
             return Response({"error": "Invalid credentials"}, status=400)
 
-    def get(self, request, *args, **kwargs):
-        print("get called")
-        return render(request, "login.html")
+#     def get(self, request, *args, **kwargs):
+#         print("get called")
+#         return render(request, "login.html")
     
     
     
 class MainView(APIView):
     def get(self, request, *args, **kwargs):
         return render(request, "main.html")
+
+
+
+
+
+
+
+class SignUpApiView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        print("signup post called")
+        username = request.data.get('username')
+        password = request.data.get('password')
+        # Create a new user with the provided information
+        user = User.objects.create_user(username=username, password=password, is_active=False, is_superuser = False)
+
+        token = Token.objects.create(user=user)
+
+        return Response({"detail": "User created successfully. Activation required."}, status=status.HTTP_201_CREATED)
+
+#     def get(self, request, *args, **kwargs):
+#         return render(request, "signup.html")
+
+
+class LogoutApiView(APIView):
+    def post(self, request, *args, **kwargs):
+        # Get the token from the request header
+        token_header = self.request.META.get('HTTP_AUTHORIZATION')
+        if token_header:
+            # Find the user associated with the token
+            try:
+                user = Token.objects.get(key=token_header).user
+            except Token.DoesNotExist:
+                return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+            # Delete the token
+            Token.objects.filter(user=user).delete()
+
+            return Response({"detail": "Successfully logged out and deleted auth token."},status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "Invalid token format."}, status=status.HTTP_400_BAD_REQUEST)
+
+#     def get(self, request, *args, **kwargs):
+#         return render(request, "logout.html")
