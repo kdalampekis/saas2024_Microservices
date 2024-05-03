@@ -10,7 +10,7 @@ import MySubmissions from "./MySubmissions";
 import NewSubmission from "./NewSubmission";
 import AllSubmissions from "./AllSubmissions";
 import ViewSubmissionResults from "./ViewSubmissionResults";
-
+import EditSubmission from "./EditSubmission";
 function App() {
     return (
         <Router>
@@ -33,6 +33,7 @@ function App() {
                         <Route path="/NewSubmission" element={<NewSubmission />} />
                         <Route path="/AllSubmissions" element={<AllSubmissions />} />
                         <Route path="/ViewSubmissionResults" element={<ViewSubmissionResults />} />
+                        <Route path="/EditSubmission" element={<EditSubmission />} />
                     </Routes>
                 </header>
                 <Footer />
