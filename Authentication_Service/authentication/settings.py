@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'authenticationService',
     'rest_framework',
     'rest_framework.authtoken',
-
+    'social_django',
+    'django.contrib.sites'
 ]
 
 MIDDLEWARE = [
@@ -130,3 +131,18 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '481747965467-teqk6d94it81m44uf3sfufeshhppm63l.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
+    'prompt': 'select_account'
+}
+
+
+LOGIN_REDIRECT_URL = '/google'

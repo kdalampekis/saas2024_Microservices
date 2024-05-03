@@ -30,9 +30,9 @@ class LoginApiView(APIView):
         else:
             return Response({"error": "Invalid credentials"}, status=400)
 
-#     def get(self, request, *args, **kwargs):
-#         print("get called")
-#         return render(request, "login.html")
+    def get(self, request, *args, **kwargs):
+        print("get called")
+        return render(request, "login.html")
     
     
     
@@ -60,8 +60,8 @@ class SignUpApiView(APIView):
 
         return Response({"detail": "User created successfully. Activation required."}, status=status.HTTP_201_CREATED)
 
-#     def get(self, request, *args, **kwargs):
-#         return render(request, "signup.html")
+    def get(self, request, *args, **kwargs):
+        return render(request, "signup.html")
 
 
 class LogoutApiView(APIView):
@@ -82,5 +82,10 @@ class LogoutApiView(APIView):
         else:
             return Response({"detail": "Invalid token format."}, status=status.HTTP_400_BAD_REQUEST)
 
-#     def get(self, request, *args, **kwargs):
-#         return render(request, "logout.html")
+    def get(self, request, *args, **kwargs):
+        return render(request, "logout.html")
+
+
+class GoogleApiView(APIView):
+    def get(self, request, *args, **kwargs):
+        return render(request, "google.html")
