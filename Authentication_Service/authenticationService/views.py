@@ -33,15 +33,6 @@ class LoginApiView(APIView):
     def get(self, request, *args, **kwargs):
         print("get called")
         return render(request, "login.html")
-    
-    
-    
-class MainView(APIView):
-    def get(self, request, *args, **kwargs):
-        return render(request, "main.html")
-
-
-
 
 
 
@@ -62,6 +53,8 @@ class SignUpApiView(APIView):
 
     def get(self, request, *args, **kwargs):
         return render(request, "signup.html")
+
+
 
 
 class LogoutApiView(APIView):
@@ -86,6 +79,33 @@ class LogoutApiView(APIView):
         return render(request, "logout.html")
 
 
+
+# Html template to test google functionality
 class GoogleApiView(APIView):
     def get(self, request, *args, **kwargs):
         return render(request, "google.html")
+
+
+
+
+# Custom logout function to test the google functionality
+# Replace with the LogoutApiView when testing with tokens
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+def logout_view(request):
+    logout(request)
+    return redirect('/login')  # Redirects the user to the login page after logout
+
+
+
+
+# from django.contrib.auth import logout
+# from django.shortcuts import redirect
+#
+# def social_login(request, backend):
+#     # Log out any currently logged-in user
+#     logout(request)
+#     # Redirect to the social auth's begin process for the specified backend
+#     return redirect('social:begin', backend=backend)
+

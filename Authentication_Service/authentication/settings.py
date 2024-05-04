@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.sites'
 ]
 
+SITE_ID = 1  # or the correct ID if different
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -143,6 +145,27 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {
     'prompt': 'select_account'
 }
+
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'authenticationService.pipeline.prevent_duplicate_association',
+#     'authenticationService.pipeline.prevent_superuser_linking',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_by_email',  # Optional: Use if you want to link by email
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
+
+
+
+
+
 
 
 LOGIN_REDIRECT_URL = '/google'
