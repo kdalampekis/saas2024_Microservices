@@ -40,6 +40,11 @@ services:
       - POSTGRES_DB=creditdb
       - POSTGRES_USER=creditdb
       - POSTGRES_PASSWORD=password
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U creditdb -d creditdb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   problem-service:
     build: ./Problem_Submission_Service
