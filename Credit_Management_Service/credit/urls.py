@@ -11,7 +11,7 @@ urlpatterns = [
     path('credits/purchase/', PurchaseCreditsView.as_view(), name='purchase-credits'),
 ]
 
-""""
+"""
 Για να καλέσετε το credits/purchase/ πρέπει να δώσετε
 στο request (ως body) ένα JSON της μορφής:
 
@@ -21,4 +21,4 @@ urlpatterns = [
 }
 
 Το credits είναι δεκαδικό μέχρι 2 ψηψία και το id ακέραιο
-""""
+"""
