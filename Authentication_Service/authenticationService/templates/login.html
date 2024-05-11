@@ -17,6 +17,9 @@
     <input type="password" id="password" name="password" required><br><br>
 
     <input type="submit" value="login">
+
+    <a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a>
+
 </form>
 </body>
 </html>
