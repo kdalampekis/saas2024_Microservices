@@ -4,6 +4,7 @@ from creditService.models import CreditTransaction
 from django.db.models import Sum
 from creditService.serializers import CreditTransactionSerializer
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 
 class GetBalanceView(APIView):
