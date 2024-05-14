@@ -97,6 +97,25 @@ def logout_view(request):
     logout(request)
     return redirect('/login')  # Redirects the user to the login page after logout
 
+from django.contrib.auth.models import User
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+
+class UserDetailsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id, format=None):
+        user = get_object_or_404(User, pk=user_id)
+        return Response({
+            'username': user.username,
+            'email': user.email,
+            'is_superuser': user.is_superuser,
+            'is_active': user.is_active
+        })
+
+
 
 
 

@@ -20,3 +20,14 @@ class PurchaseCreditsView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class UpdateUserCreditsView(APIView):
+    permission_classes = [IsAuthenticated]  # Depending on your needs, this might be more restrictive
+
+    def patch(self, request, user_id, format=None):
+        user = get_object_or_404(User, pk=user_id)
+        credits = request.data.get('credits')
+        if credits:
+            user.profile.credits = credits  # Assuming 'credits' is stored in a related Profile model
+            user.profile.save()
+            return Response({'status': 'User credits updated'})
+        return Response({'error': 'Invalid request'}, status=status.HTTP_400_BAD_REQUEST)
