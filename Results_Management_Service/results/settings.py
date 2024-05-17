@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'results_app',
 ]
 
 MIDDLEWARE = [
@@ -83,7 +84,15 @@ DATABASES = {
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
         'HOST': 'results-db',  # Use the service name defined in docker-compose.yml
         'PORT': '5432',
-    }
+    },
+    'computation_db': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB', 'computationdb'),
+            'USER': os.getenv('POSTGRES_USER', 'computationdb'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
+            'HOST': 'computation-db',  # Use the service name defined in docker-compose.yml
+            'PORT': '5432',
+        }
 }
 
 
@@ -128,3 +137,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# DATABASE_ROUTERS = ['app.database_router.ComputationDBRouter']

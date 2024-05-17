@@ -11,6 +11,16 @@ import os
 import re
 from .models import *
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .serializers import IncomeSerializer
+################################################################
+#API fetching problems
+class IncomeData(APIView):
+    def get(self, request):
+        incomes = Problems.objects.all()
+        serializer = IncomeSerializer(incomes, many=True)
+        return Response(serializer.data)
 
 
 def parse_and_save_data(result):
@@ -47,27 +57,27 @@ def parse_and_save_data(result):
     return objective,vehicles,routes,distances,maximum
 
 def save_route_data(objective, vehicles, routes, distances, maximum):
-    # Assuming each list contains exactly one entry for simplicity, adjust as needed
-    if objective:
-        Objective.objects.create(value=int(objective[0]))
+    if objective and vehicles and routes and distances and maximum:
+        # Concatenate all route descriptions into one string
+        route_descriptions = []
+        for v_data, route, distance in zip(vehicles, routes, distances):
+            try:
+                vehicle_id = int(v_data.split()[3].strip(':'))  # Extract vehicle ID
+                route_description = f"Route for vehicle {vehicle_id}: with route :{route} and distance of: {distance.strip()}m"
+                route_descriptions.append(route_description)
+            except ValueError as e:
+                print(f"Error processing vehicle data: {e}")
+                continue
 
-    if maximum:
-        Maximum.objects.create(max_distance=int(maximum[0].replace('m', '')))
-
-    # Assuming 'vehicles', 'routes', and 'distances' are lists with corresponding data
-    for v_data, route, distance in zip(vehicles, routes, distances):
-        # Extract vehicle ID; assuming it's the first element before the colon
-        vehicle_id = int(v_data.split(':')[0].strip())
-        distance = int(distance.replace('m', '').strip())
-
-        # Check if Vehicle exists and update or create accordingly
-        vehicle, created = Vehicle.objects.get_or_create(vehicle_id=vehicle_id)
-        if created:
-            vehicle.route = route
-            vehicle.distance = distance
-            vehicle.save()
-        else:
-            vehicle.add_route(route, distance)
+        # Join all routes into a single text field
+        routes_text = "\n\n".join(route_descriptions)
+        # Create a new problem record
+        Problems.objects.create(
+            objective_id=int(objective[0]),
+            number_of_vehicles=len(vehicles),
+            routes=routes_text,
+            maximum_distance=int(maximum[0].replace('m', ''))
+        )
 
 def home(request):
     return HttpResponse("Welcome to My App!")

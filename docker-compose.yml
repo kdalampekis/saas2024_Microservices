@@ -96,6 +96,7 @@ services:
       - POSTGRES_PASSWORD=password
     depends_on:
       - results-db
+#      - computation-db
 
   results-db:
     image: postgres
