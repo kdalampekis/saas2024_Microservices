@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 
-from .vrpSolver import main
+
 import json
 import subprocess
 import os
@@ -13,7 +13,12 @@ from .models import *
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import IncomeSerializer
+from .serializers import *
+from rest_framework.decorators import api_view
+from rest_framework import status
+
+from .Scripts.nQueens import solve_nqueens
+from .Scripts.vrpSolver import main
 ################################################################
 #API fetching problems
 class IncomeData(APIView):
@@ -86,7 +91,7 @@ def index(request):
     return render(request, 'solver.html')
 
 @csrf_exempt  # You can remove this if using CSRF tokens
-@require_http_methods(["POST"])
+@api_view(["POST"])
 def solve_vrp(request):
     try:
         print("Received a POST request.")
@@ -98,7 +103,7 @@ def solve_vrp(request):
             print("JSON file successfully loaded.")
         else:
             print("No JSON file provided.")
-            return JsonResponse({'error': 'No JSON file provided'}, status=400)
+            return Response({'error': 'No JSON file provided'}, status=status.HTTP_400_BAD_REQUEST)
 
         number_of_locations = request.POST.get('number_of_locations')
         number_of_vehicles = request.POST.get('number_of_vehicles')
@@ -112,45 +117,60 @@ def solve_vrp(request):
         print(f"Temporary JSON file created at {temp_file_path}")
 
         # Execute the Python script using subprocess
-
-        print("Executing the VRP solver script...")
-
-        print("Setting the script path")
         script_path = os.path.join(os.getcwd(), 'Scripts', 'vrpSolver.py')
         print(f"Script path: {script_path}")
 
-    except Exception as e:
-        print(f"First error: {str(e)}")
-
-
-
-
-    try:
         result = subprocess.run(
             ['python', script_path, temp_file_path, number_of_locations, number_of_vehicles, vehicle_capacity],
             capture_output=True, text=True
         )
 
-
         if result.stderr:
             print(f"Script errors: {result.stderr}")
-            return JsonResponse({'error': result.stderr}, status=400)
+            return Response({'error': result.stderr}, status=status.HTTP_400_BAD_REQUEST)
 
         print("Script execution completed.")
         if result.stdout:
-            print(result)
             print(f"Script output: {result.stdout}")
-            objective = []
-            vehicles = []
-            routes = []
-            distances = []
-            maximum = []
-            objective, vehicles, routes, distances, maximum=parse_and_save_data(result.stdout)
-            print("Now we see if the returned results are correct")
-            print(objective, vehicles, routes, distances, maximum)
-            save_route_data(objective, vehicles, routes, distances, maximum)
+            # Assuming parse_and_save_data is a function that processes the script output
+            objective, vehicles, routes, distances, maximum = parse_and_save_data(result.stdout)
+            print(f"Parsed results: {objective}, {vehicles}, {routes}, {distances}, {maximum}")
 
-        return JsonResponse({'result':result.stdout}, status=200)
+        return Response({'result': result.stdout}, status=status.HTTP_200_OK)
     except Exception as e:
         print(f"An error occurred: {str(e)}")
-        return JsonResponse({'error': str(e)}, status=400)
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+@csrf_exempt  # You can remove this if using CSRF tokens
+@api_view(['POST'])
+def nqueens_api(request):
+    try:
+        # Extracting the board_size directly from request.POST
+        board_size = request.POST.get('board_size')
+
+        if board_size is None:
+            return Response({'error': 'board_size is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Convert board_size to an integer
+        try:
+            board_size = int(board_size)
+        except ValueError:
+            return Response({'error': 'board_size must be an integer'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate board_size
+        if board_size < 1:
+            return Response({'error': 'board_size must be at least 1'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Assuming solve_nqueens is your function that solves the N-Queens problem
+        solutions, stats = solve_nqueens(board_size)
+
+        return Response({
+            'board_size': board_size,
+            'solutions': solutions,
+            'stats': stats
+        }, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
