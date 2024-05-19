@@ -8,3 +8,7 @@ class IncomeSerializer(serializers.ModelSerializer):
 
 class NQueensSerializer(serializers.Serializer):
     board_size = serializers.IntegerField(min_value=1)
+
+
+class NQueensSerializer(serializers.Serializer):
+    board_size = serializers.IntegerField(min_value=1)

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'results_app',
 ]
 
@@ -84,15 +85,7 @@ DATABASES = {
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
         'HOST': 'results-db',  # Use the service name defined in docker-compose.yml
         'PORT': '5432',
-    },
-    'computation_db': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB', 'computationdb'),
-            'USER': os.getenv('POSTGRES_USER', 'computationdb'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
-            'HOST': 'computation-db',  # Use the service name defined in docker-compose.yml
-            'PORT': '5432',
-        }
+    }
 }
 
 
