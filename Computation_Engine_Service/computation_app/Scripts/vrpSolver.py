@@ -65,15 +65,23 @@ def read_json_file(file_path):
         data = json.load(file)
         return data.get('Locations', [])  # Access the "Locations" array
 
-def vrp_solver(input_file, num_vehicles, depot, max_distance):
-    """Solves the VRP problem with the given parameters."""
+def main():
+    """Entry point of the program."""
+    if len(sys.argv) != 5:
+        print("Wrong number of args.\nUsage: python <script_name.py> <input_file.json> <num_vehicles> <depot> <max_distance>")
+        sys.exit(1)
+
+    input_file = os.path.abspath(sys.argv[1])  # Get absolute path
+    num_vehicles = int(sys.argv[2])
+    depot = int(sys.argv[3])
+    max_distance = int(sys.argv[4])
     # Read JSON file
     locations = read_json_file(input_file)
 
     # Instantiate the data problem.
     data = create_data_model(locations, num_vehicles, depot)
 
-    # Create the routing index manager.
+# Create the routing index manager.
     manager = pywrapcp.RoutingIndexManager(
         len(data["distance_matrix"]), data["num_vehicles"], data["depot"]
     )
@@ -84,8 +92,9 @@ def vrp_solver(input_file, num_vehicles, depot, max_distance):
     # Create and register a transit callback.
     def distance_callback(from_index, to_index):
         """Returns the distance between the two nodes."""
+        # Convert from routing variable Index to distance matrix NodeIndex.
         from_node = manager.IndexToNode(from_index)
-        to_node = manager.IndexToNode(from_index)
+        to_node = manager.IndexToNode(to_index)
         return data["distance_matrix"][from_node][to_node]
 
     transit_callback_index = routing.RegisterTransitCallback(distance_callback)
@@ -118,4 +127,7 @@ def vrp_solver(input_file, num_vehicles, depot, max_distance):
     if solution:
         print_solution(data, manager, routing, solution)
     else:
-        print("No solution found!")
+        print("No solution found !")
+
+if __name__ == "__main__":
+    main()

@@ -21,6 +21,7 @@ from .Scripts.nQueens import solve_nqueens
 from .Scripts.vrpSolver import main
 ################################################################
 #API fetching problems
+
 class IncomeData(APIView):
     def get(self, request):
         incomes = Problems.objects.all()
@@ -60,6 +61,7 @@ def parse_and_save_data(result):
     print("Maximum:", maximum)
 
     return objective,vehicles,routes,distances,maximum
+
 
 def save_route_data(objective, vehicles, routes, distances, maximum):
     if objective and vehicles and routes and distances and maximum:
@@ -134,6 +136,7 @@ def solve_vrp(request):
             print(f"Script output: {result.stdout}")
             # Assuming parse_and_save_data is a function that processes the script output
             objective, vehicles, routes, distances, maximum = parse_and_save_data(result.stdout)
+            save_route_data(objective,vehicles,routes,distances,maximum)
             print(f"Parsed results: {objective}, {vehicles}, {routes}, {distances}, {maximum}")
 
         return Response({'result': result.stdout}, status=status.HTTP_200_OK)
@@ -167,10 +170,10 @@ def nqueens_api(request):
         # Assuming solve_nqueens is your function that solves the N-Queens problem
         solutions, stats = solve_nqueens(board_size)
 
-        return Response({
+        return JsonResponse({
             'board_size': board_size,
             'solutions': solutions,
             'stats': stats
-        }, status=status.HTTP_200_OK)
+        }, status=200)
     except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'error': str(e)}, status=400)
