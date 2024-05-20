@@ -1,30 +1,30 @@
-from django.shortcuts import get_object_or_404
-from django.contrib.auth.models import User
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
+import requests
+from django.http import JsonResponse
 
-class UserDetailView(APIView):
-    permission_classes = [IsAdminUser]  # Ensure only admins can access
+def fetch_submissions():
+    try:
+        url = f'http://problem-service:8000/submissions/metadata/'
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
+    except requests.ConnectionError as e:
+        print(f"Failed to connect to the submission service: {e}")
+        return None
+    except requests.HTTPError as e:
+        print(f"HTTP error occurred: {e}")
+        return None
 
-    def get(self, request, user_id, format=None):
-        user = get_object_or_404(User, pk=user_id)
-        return Response({
-            'username': user.username,
-            'email': user.email,
-            'is_superuser': user.is_superuser,
-            'is_active': user.is_active
-        })
+def submissions_view(request):
+    submissions = fetch_submissions()
+    if submissions is None:
+        return JsonResponse({'error': 'Failed to fetch data from submission service'}, status=500)
+    return JsonResponse(submissions, safe=False)
 
-class UpdateUserCreditsView(APIView):
-    permission_classes = [IsAdminUser]  # Ensure only admins can access
 
-    def patch(self, request, user_id, format=None):
-        user = get_object_or_404(User, pk=user_id)
-        credits = request.data.get('credits')
-        if credits is not None:
-            user.credits = credits  # Assume 'credits' is a field on the User model
-            user.save(update_fields=['credits'])
-            return Response({'status': 'credits updated'})
-        else:
-            return Response({'error': 'Invalid request'}, status=400)
+def delete_metadata(submission_id):
+    url = f"http://problem-service:8003/metadata/delete/{submission_id}/"
+    response = requests.delete(url)
+    if response.status_code == 204:
+        return "Metadata successfully deleted."
+    else:
+        return f"Error: {response.status_code}, {response.text}"

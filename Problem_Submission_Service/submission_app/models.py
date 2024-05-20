@@ -34,6 +34,8 @@ class Metadata(models.Model):
     date = models.DateTimeField(auto_now_add=True, help_text="The date and time when the metadata was recorded")
     credit_cost = models.DecimalField(max_digits=10, decimal_places=2, help_text="The cost in credits for solving the problem")
     problem_type = models.ForeignKey(SolverModel, on_delete=models.CASCADE, related_name='metadata_problem_type', help_text="Reference to the Solver Model for problem type")
+    is_ready = models.BooleanField(default=False)
+    is_executed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.username} - {self.problem_type.title} ({self.date.strftime('%Y-%m-%d %H:%M')})"

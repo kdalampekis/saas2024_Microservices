@@ -1,7 +1,13 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import requests
+from .models import Metadata
+from .serializers import MetadataSerializer
+from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework import viewsets, status
+
 
 # Create your views here.
 def vehicle(request):
@@ -43,3 +49,18 @@ def submit_problem(request, problem_name):
         # Handle JSON decode error
         print(f"JSON decode error: {e}")
         return Response({"error": "JSON decode error"}, status=500)
+
+
+
+class MetadataViewSet(viewsets.ModelViewSet):
+    queryset = Metadata.objects.all()
+    serializer_class = MetadataSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            # You can override this method to fetch the metadata using the submission_id
+            metadata = Metadata.objects.get(submission_id=kwargs.get('pk'))
+            metadata.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Metadata.DoesNotExist:
+            return Response({'error': 'Metadata not found'}, status=status.HTTP_404_NOT_FOUND)
