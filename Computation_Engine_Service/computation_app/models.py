@@ -1,14 +1,5 @@
 from django.db import models
 
-class Results(models.Model):
-    name = models.CharField(max_length=200)
-    score = models.IntegerField()
-    passed = models.BooleanField()
-    date = models.DateField()
-
-    def __str__(self):
-        return f"{self.name} - {self.score} - {'Passed' if self.passed else 'Failed'}"
-
 class Problems(models.Model):
     objective_id = models.IntegerField()
     number_of_vehicles = models.IntegerField()
@@ -26,3 +17,12 @@ class Person(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}, Age: {self.age}"
+
+class Results(models.Model):
+    problem_name = models.CharField(max_length=100)
+    response_data = models.JSONField()
+    time_taken = models.FloatField(null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.problem_name

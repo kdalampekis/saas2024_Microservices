@@ -1,18 +1,9 @@
-"""Minimal jobshop example."""
 import collections
 from ortools.sat.python import cp_model
 
-
-def main() -> None:
+def job_shop_solver(jobs_data):
     """Minimal jobshop problem."""
     # Data.
-    jobs_data = [  # task = (machine_id, processing_time).
-        [(0, 3), (1, 2), (2, 2)],  # Job0
-        [(0, 2), (2, 1), (1, 4)],  # Job1
-        [(1, 4), (2, 3)],  # Job2
-        [(1,2),(2,5)]
-    ]
-
     machines_count = 1 + max(task[0] for job in jobs_data for task in job)
     all_machines = range(machines_count)
     # Computes horizon dynamically as the sum of all durations.
@@ -36,9 +27,9 @@ def main() -> None:
         for task_id, task in enumerate(job):
             machine, duration = task
             suffix = f"_{job_id}_{task_id}"
-            start_var = model.new_int_var(0, horizon, "start" + suffix)
-            end_var = model.new_int_var(0, horizon, "end" + suffix)
-            interval_var = model.new_interval_var(
+            start_var = model.NewIntVar(0, horizon, "start" + suffix)
+            end_var = model.NewIntVar(0, horizon, "end" + suffix)
+            interval_var = model.NewIntervalVar(
                 start_var, duration, end_var, "interval" + suffix
             )
             all_tasks[job_id, task_id] = task_type(
@@ -48,79 +39,76 @@ def main() -> None:
 
     # Create and add disjunctive constraints.
     for machine in all_machines:
-        model.add_no_overlap(machine_to_intervals[machine])
+        model.AddNoOverlap(machine_to_intervals[machine])
 
     # Precedences inside a job.
     for job_id, job in enumerate(jobs_data):
         for task_id in range(len(job) - 1):
-            model.add(
+            model.Add(
                 all_tasks[job_id, task_id + 1].start >= all_tasks[job_id, task_id].end
             )
 
     # Makespan objective.
-    obj_var = model.new_int_var(0, horizon, "makespan")
-    model.add_max_equality(
+    obj_var = model.NewIntVar(0, horizon, "makespan")
+    model.AddMaxEquality(
         obj_var,
         [all_tasks[job_id, len(job) - 1].end for job_id, job in enumerate(jobs_data)],
     )
-    model.minimize(obj_var)
+    model.Minimize(obj_var)
 
     # Creates the solver and solve.
     solver = cp_model.CpSolver()
-    status = solver.solve(model)
+    status = solver.Solve(model)
+
+    result = {
+        "status": "No solution found.",
+        "optimal_schedule_length": None,
+        "assigned_jobs": {},
+        "statistics": {
+            "conflicts": solver.NumConflicts(),
+            "branches": solver.NumBranches(),
+            "wall_time": solver.WallTime()
+        }
+    }
 
     if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
-        print("Solution:")
-        # Create one list of assigned tasks per machine.
         assigned_jobs = collections.defaultdict(list)
         for job_id, job in enumerate(jobs_data):
             for task_id, task in enumerate(job):
                 machine = task[0]
                 assigned_jobs[machine].append(
                     assigned_task_type(
-                        start=solver.value(all_tasks[job_id, task_id].start),
+                        start=solver.Value(all_tasks[job_id, task_id].start),
                         job=job_id,
                         index=task_id,
                         duration=task[1],
                     )
                 )
 
-        # Create per machine output lines.
-        output = ""
-        for machine in all_machines:
-            # Sort by starting time.
-            assigned_jobs[machine].sort()
-            sol_line_tasks = "Machine " + str(machine) + ": "
-            sol_line = "           "
+        result["status"] = "Optimal" if status == cp_model.OPTIMAL else "Feasible"
+        result["optimal_schedule_length"] = solver.ObjectiveValue()
 
-            for assigned_task in assigned_jobs[machine]:
-                name = f"job_{assigned_task.job}_task_{assigned_task.index}"
-                # add spaces to output to align columns.
-                sol_line_tasks += f"{name:15}"
+        for machine, tasks in assigned_jobs.items():
+            tasks.sort()
+            result["assigned_jobs"][machine] = [
+                {
+                    "job": task.job,
+                    "task_index": task.index,
+                    "start": task.start,
+                    "duration": task.duration,
+                }
+                for task in tasks
+            ]
 
-                start = assigned_task.start
-                duration = assigned_task.duration
-                sol_tmp = f"[{start},{start + duration}]"
-                # add spaces to output to align columns.
-                sol_line += f"{sol_tmp:15}"
+    return result
 
-            sol_line += "\n"
-            sol_line_tasks += "\n"
-            output += sol_line_tasks
-            output += sol_line
+# jobs_data = [  # task = (machine_id, processing_time).
+#     [(0, 3), (1, 2), (2, 2)],  # Job0
+#     [(0, 2), (2, 1), (1, 4)],  # Job1
+#     [(1, 4), (2, 3)],  # Job2
+#     [(1,2),(2,5)]
+# ]
+#
+# results=job_shop_solver(jobs_data)
+# print(results)
 
-        # Finally print the solution found.
-        print(f"Optimal Schedule Length: {solver.objective_value}")
-        print(output)
-    else:
-        print("No solution found.")
-
-    # Statistics.
-    print("\nStatistics")
-    print(f"  - conflicts: {solver.num_conflicts}")
-    print(f"  - branches : {solver.num_branches}")
-    print(f"  - wall time: {solver.wall_time}s")
-
-
-if __name__ == "__main__":
-    main()

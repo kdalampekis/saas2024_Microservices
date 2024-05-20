@@ -16,9 +16,8 @@ Including another URLconf
 """
 
 from django.urls import path
-from .views import UserDetailView, UpdateUserCreditsView
+from .views import submissions_view
 
 urlpatterns = [
-    path('users/<int:user_id>/', UserDetailView.as_view(), name='user-detail'),
-    path('users/<int:user_id>/update_credits/', UpdateUserCreditsView.as_view(), name='update-user-credits'),
+    path('submissions/', submissions_view, name='submissions'),
 ]
