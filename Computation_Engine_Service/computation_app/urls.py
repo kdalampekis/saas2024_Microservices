@@ -16,4 +16,7 @@ urlpatterns = [
     # Add more paths as needed
 
     path('sent_data/', sent_data, name='sent_data'),
+
+
+    path('problem_submission/', computation_view, name='computation_view'),
 ]

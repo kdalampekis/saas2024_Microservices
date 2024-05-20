@@ -40,8 +40,26 @@ def save_api_response(api_name, response_data,time_taken):
         time_taken=time_taken
     )
 
+@csrf_exempt
+def computation_view(request, problem_name):
+    if request.method == 'POST':
+        try:
+            print("The problem name here is:",problem_name)
+            problem_views = {
+                'nqueens': nqueens_api,
+                # Add other problem views here
+            }
 
-
+            if problem_name in problem_views:
+                # Call the appropriate view function with the original request
+                return problem_views[problem_name](request)
+            else:
+                return JsonResponse({"error": "Unknown problem_name"}, status=400)
+        except Exception as e:
+            print(f"Error processing request: {e}")
+            return JsonResponse({"error": "Processing error"}, status=500)
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=405)
 
 @api_view(['GET'])
 def sent_data(request):
@@ -173,6 +191,7 @@ def solve_vrp(request):
 @csrf_exempt  # You can remove this if using CSRF tokens
 @api_view(['POST'])
 def nqueens_api(request):
+    print("I got into the queens_api view!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     try:
         # Extracting the board_size directly from request.POST
         board_size = request.POST.get('board_size')
