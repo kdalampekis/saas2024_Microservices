@@ -10,6 +10,7 @@ urlpatterns = [
     path('credits/balance/<int:user_id>/', GetBalanceView.as_view(), name='get-balance'),
     path('credits/purchase/', PurchaseCreditsView.as_view(), name='purchase-credits'),
     path('credits/<int:user_id>/spend/', SpendCreditsView.as_view(), name='update-credits'),
+    path('credits/initialize_user_credits/', InitializeUserCreditBalanceView.as_view(), name='initialize_user_credits'),
 ]
 
 """
@@ -17,7 +18,7 @@ urlpatterns = [
 στο request (ως body) ένα JSON της μορφής:
 
 {
-    "user": 10,
+    "user_id": 10,
     "credits": 2000
 }
 
