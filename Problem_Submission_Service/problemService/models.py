@@ -16,6 +16,7 @@ class SolverModel(models.Model):
 
 class Metadata(models.Model):
     submission_id = models.AutoField(primary_key=True, help_text="Unique identifier for the submission")
+    name = models.CharField(max_length=200, help_text="The name of submission")
     username = models.CharField(max_length=100, help_text="The username of the user involved in the problem")
     date = models.DateTimeField(auto_now_add=True, help_text="The date and time when the metadata was recorded")
     credit_cost = models.DecimalField(max_digits=10, decimal_places=2, help_text="The cost in credits for solving the problem")

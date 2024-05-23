@@ -1,12 +1,10 @@
-from django.shortcuts import render
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
-from rest_framework.viewsets import ReadOnlyModelViewSet
 from .models import *
 from .serializers import *
-
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view
@@ -98,10 +96,22 @@ class MetadataViewSet(viewsets.ModelViewSet):
     queryset = Metadata.objects.all()
     serializer_class = MetadataSerializer
 
-    def destroy(self, request, *args, **kwargs):
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def all_submissions(self, request):
+        """
+        This custom action returns all metadata entries.
+        """
+        metadata = Metadata.objects.all()
+        serializer = self.get_serializer(metadata, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['delete'], permission_classes=[IsAuthenticated])
+    def delete_submission(self, request, pk=None):
+        """
+        This custom action deletes a metadata entry based on its 'submission_id'.
+        """
         try:
-            # You can override this method to fetch the metadata using the submission_id
-            metadata = Metadata.objects.get(submission_id=kwargs.get('pk'))
+            metadata = Metadata.objects.get(submission_id=pk)
             metadata.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Metadata.DoesNotExist:

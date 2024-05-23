@@ -7,7 +7,7 @@ class MetadataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Metadata
-        fields = ['submission_id', 'username', 'date', 'credit_cost', 'problem_type_title', 'status']
+        fields = ['submission_id', 'user', 'username', 'date', 'credit_cost', 'problem_type_title', 'status']
 
     def get_status(self, obj):
         if obj.is_executed:

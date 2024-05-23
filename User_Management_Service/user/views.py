@@ -3,7 +3,7 @@ from django.http import JsonResponse
 
 def fetch_submissions():
     try:
-        url = f'http://problem-service:8000/submissions/metadata/'
+        url = f'http://problem-service:8000/metadata/all_submissions/'
         response = requests.get(url)
         response.raise_for_status()
         return response.json()
@@ -21,10 +21,14 @@ def submissions_view(request):
     return JsonResponse(submissions, safe=False)
 
 
-def delete_metadata(submission_id):
-    url = f"http://problem-service:8003/metadata/delete/{submission_id}/"
-    response = requests.delete(url)
-    if response.status_code == 204:
-        return "Metadata successfully deleted."
+
+def delete_metadata_view(request, submission_id):
+    if request.method == 'DELETE':
+        url = f"http://problem-service:8000/metadata/{submission_id}/delete/"
+        response = requests.delete(url)
+        if response.status_code == 204:
+            return JsonResponse({'message': 'Metadata successfully deleted.'}, status=204)
+        else:
+            return JsonResponse({'error': response.text}, status=response.status_code)
     else:
-        return f"Error: {response.status_code}, {response.text}"
+        return JsonResponse({'error': 'Method not allowed'}, status=405)

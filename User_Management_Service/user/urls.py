@@ -16,8 +16,10 @@ Including another URLconf
 """
 
 from django.urls import path
-from .views import submissions_view
+from .views import submissions_view, delete_metadata_view
 
 urlpatterns = [
     path('submissions/', submissions_view, name='submissions'),
+    path('metadata/delete/<int:submission_id>/', delete_metadata_view, name='delete-metadata'),
 ]
+
