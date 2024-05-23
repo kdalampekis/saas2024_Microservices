@@ -26,4 +26,5 @@ urlpatterns = [
     path('accounts/', include('social_django.urls', namespace='social')),
     path('google/', GoogleApiView.as_view(), name="google"),
     path('logout/', logout_view, name='logout'),
+    path('users/<int:user_id>/', UserDetailsView.as_view(), name='user-detail'),
 ]

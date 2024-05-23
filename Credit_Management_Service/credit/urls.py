@@ -9,6 +9,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('credits/balance/<int:user_id>/', GetBalanceView.as_view(), name='get-balance'),
     path('credits/purchase/', PurchaseCreditsView.as_view(), name='purchase-credits'),
+    path('users/<int:user_id>/update_credits/', UpdateUserCreditsView.as_view(), name='update-credits'),
 ]
 
 """

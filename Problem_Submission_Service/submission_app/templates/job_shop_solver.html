@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Scheduler Input</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .job {
+            margin-bottom: 20px;
+        }
+        .job label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .task {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Job Scheduler Input</h1>
+<form id="jobs-form">
+    <label for="job-count">Number of Jobs:</label>
+    <input type="number" id="job-count" name="job-count" min="1" value="1">
+    <button type="button" onclick="generateJobInputs()">Generate Job Inputs</button>
+    <div id="jobs-container"></div>
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    function generateJobInputs() {
+        const jobCount = document.getElementById('job-count').value;
+        const jobsContainer = document.getElementById('jobs-container');
+        jobsContainer.innerHTML = ''; // Clear previous inputs
+
+        for (let i = 0; i < jobCount; i++) {
+            const jobDiv = document.createElement('div');
+            jobDiv.className = 'job';
+            jobDiv.innerHTML = `
+                    <h3>Job ${i}</h3>
+                    <label for="task-count-${i}">Number of Tasks:</label>
+                    <input type="number" id="task-count-${i}" name="task-count-${i}" min="1" value="1" onchange="generateTaskInputs(${i})">
+                    <div id="tasks-container-${i}" class="tasks-container"></div>
+                `;
+            jobsContainer.appendChild(jobDiv);
+        }
+    }
+
+    function generateTaskInputs(jobIndex) {
+        const taskCount = document.getElementById(`task-count-${jobIndex}`).value;
+        const tasksContainer = document.getElementById(`tasks-container-${jobIndex}`);
+        tasksContainer.innerHTML = ''; // Clear previous inputs
+
+        for (let i = 0; i < taskCount; i++) {
+            const taskDiv = document.createElement('div');
+            taskDiv.className = 'task';
+            taskDiv.innerHTML = `
+                    <label for="task-${jobIndex}-${i}">Task ${i}:</label>
+                    <input type="number" id="machine-id-${jobIndex}-${i}" name="machine-id-${jobIndex}-${i}" placeholder="Machine ID" required>
+                    <input type="number" id="processing-time-${jobIndex}-${i}" name="processing-time-${jobIndex}-${i}" placeholder="Processing Time" required>
+                `;
+            tasksContainer.appendChild(taskDiv);
+        }
+    }
+
+    document.getElementById('jobs-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const jobCount = formData.get('job-count');
+        const jobsData = [];
+
+        for (let i = 0; i < jobCount; i++) {
+            const taskCount = formData.get(`task-count-${i}`);
+            const tasks = [];
+
+            for (let j = 0; j < taskCount; j++) {
+                const machineId = formData.get(`machine-id-${i}-${j}`);
+                const processingTime = formData.get(`processing-time-${i}-${j}`);
+                tasks.push([parseInt(machineId), parseInt(processingTime)]);
+            }
+
+            jobsData.push(tasks);
+        }
+
+        console.log('Jobs Data:', jobsData);
+        alert('Jobs Data has been logged to the console.');
+    });
+</script>
+</body>
+</html>

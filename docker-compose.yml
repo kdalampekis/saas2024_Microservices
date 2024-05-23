@@ -11,6 +11,8 @@ services:
       - POSTGRES_PASSWORD=password
     depends_on:
       - user-db
+    networks:
+      - app-network
 
   user-db:
     image: postgres
@@ -20,6 +22,8 @@ services:
       - POSTGRES_DB=userdb
       - POSTGRES_USER=userdb
       - POSTGRES_PASSWORD=password
+    networks:
+      - app-network
 
   credit-service:
     build: ./Credit_Management_Service
@@ -31,6 +35,8 @@ services:
       - POSTGRES_PASSWORD=password
     depends_on:
       - credit-db
+    networks:
+      - app-network
 
   credit-db:
     image: postgres
@@ -40,6 +46,8 @@ services:
       - POSTGRES_DB=creditdb
       - POSTGRES_USER=creditdb
       - POSTGRES_PASSWORD=password
+    networks:
+      - app-network
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U creditdb -d creditdb" ]
       interval: 10s
@@ -56,6 +64,8 @@ services:
       - POSTGRES_PASSWORD=password
     depends_on:
       - problem-db
+    networks:
+      - app-network
 
   problem-db:
     image: postgres
@@ -65,6 +75,8 @@ services:
       - POSTGRES_DB=problemdb
       - POSTGRES_USER=problemdb
       - POSTGRES_PASSWORD=password
+    networks:
+      - app-network
 
   computation-service:
     build: ./Computation_Engine_Service
@@ -76,6 +88,8 @@ services:
       - POSTGRES_PASSWORD=password
     depends_on:
       - computation-db
+    networks:
+      - app-network
 
   computation-db:
     image: postgres
@@ -85,6 +99,8 @@ services:
       - POSTGRES_DB=computationdb
       - POSTGRES_USER=computationdb
       - POSTGRES_PASSWORD=password
+    networks:
+      - app-network
 
   results-service:
     build: ./Results_Management_Service
@@ -96,6 +112,9 @@ services:
       - POSTGRES_PASSWORD=password
     depends_on:
       - results-db
+    networks:
+      - app-network
+#      - computation-db
 
   results-db:
     image: postgres
@@ -105,6 +124,8 @@ services:
       - POSTGRES_DB=resultsdb
       - POSTGRES_USER=resultsdb
       - POSTGRES_PASSWORD=password
+    networks:
+      - app-network
 
   analytics-service:
     build: ./Analytics_Logging_Service
@@ -116,6 +137,8 @@ services:
       - POSTGRES_PASSWORD=password
     depends_on:
       - analytics-db
+    networks:
+      - app-network
 
   analytics-db:
     image: postgres
@@ -125,6 +148,8 @@ services:
       - POSTGRES_DB=analyticsdb
       - POSTGRES_USER=analyticsdb
       - POSTGRES_PASSWORD=password
+    networks:
+      - app-network
 
   authentication-service:
     build: ./Authentication_Service

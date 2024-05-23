@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload JSON for VRP</title>
+</head>
+<body>
+<h1>Upload JSON File for VRP Solver</h1>
+<form action="http://localhost:8004/computation/solve-vrp/" method="post" enctype="multipart/form-data">
+    <input type="file" name="locations_file" required><br>
+    <input type="text" name="number_of_locations" placeholder="Number of Locations" required><br>
+    <input type="text" name="number_of_vehicles" placeholder="Number of Vehicles" required><br>
+    <input type="text" name="vehicle_capacity" placeholder="Vehicle Capacity" required><br>
+    <button type="submit">Solve VRP</button>
+</form>
+
+</body>
+</html>
