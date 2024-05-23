@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'submission_app',
     'rest_framework',
+    'problemService',
 ]
 
 MIDDLEWARE = [
@@ -85,8 +85,9 @@ DATABASES = {
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
         'HOST': 'problem-db',  # Use the service name defined in docker-compose.yml
         'PORT': '5432',
-    }
+    },
 }
+
 
 
 

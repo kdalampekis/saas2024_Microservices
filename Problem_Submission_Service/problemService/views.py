@@ -1,12 +1,54 @@
+from django.shortcuts import render
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, viewsets
+from rest_framework.viewsets import ReadOnlyModelViewSet
+from .models import *
+from .serializers import *
+
 from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
 import requests
-from .models import Metadata
-from .serializers import MetadataSerializer
-from rest_framework.viewsets import ReadOnlyModelViewSet
-from rest_framework import viewsets, status
+
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+class MetadataCreateView(APIView):
+    def post(self, request, model_id):
+        logger.debug(f'Received POST request for SolverModel model_id: {model_id}')
+        try:
+            solver_model = SolverModel.objects.get(model_id=model_id)
+            logger.debug(f'SolverModel found: {solver_model}')
+        except SolverModel.DoesNotExist:
+            logger.error(f'SolverModel with model_id {model_id} not found')
+            return Response({'error': 'SolverModel not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        data = request.data.copy()
+        data['problem_type'] = solver_model.model_id
+
+        serializer = MetadataSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self, request, model_id):
+        logger.debug(f'Received GET request for SolverModel model_id: {model_id}')
+        try:
+            solver_model = SolverModel.objects.get(model_id=model_id)
+            logger.debug(f'SolverModel found: {solver_model}')
+        except SolverModel.DoesNotExist:
+            logger.error(f'SolverModel with model_id {model_id} not found')
+            return Response({'error': 'SolverModel not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        metadata_entries = Metadata.objects.filter(problem_type=solver_model)
+        serializer = MetadataSerializer(metadata_entries, many=True)
+        return Response(serializer.data)
+
 
 
 # Create your views here.
