@@ -114,7 +114,7 @@ services:
       - results-db
     networks:
       - app-network
-#      - computation-db
+  #      - computation-db
 
   results-db:
     image: postgres

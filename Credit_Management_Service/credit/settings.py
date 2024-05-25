@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-@p58p=hb%ye-cu$l*&7m1$9#*_(x&0ie*$*m@fut=d24w*$4#s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'creditService',
     'rest_framework',
 ]
-
+import os
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -49,7 +49,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'creditService.middleware.CsrfExemptMiddleware',  # Add your custom middleware here
+
 ]
+
+
+CSRF_EXEMPT_PATHS = [
+    'credits/initialize_user_credits/',  # Add your endpoint here
+]
+
+CREDIT_SERVICE_URL = os.getenv('CREDIT_SERVICE_URL', 'http://credit-service:8000')
+
 
 ROOT_URLCONF = 'credit.urls'
 

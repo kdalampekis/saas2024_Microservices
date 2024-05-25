@@ -35,6 +35,19 @@ class LoginApiView(APIView):
         return render(request, "login.html")
 
 
+import requests
+
+def create_user_credit_balance(user_id):
+    url = f"http://credit-service:8000/credits/initialize_user_credits/"
+    data = {
+        "user_id": user_id,
+    }
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    response = requests.post(url, json=data, headers=headers)
+    return response.status_code, response.text
+
 
 
 class SignUpApiView(APIView):
@@ -45,9 +58,16 @@ class SignUpApiView(APIView):
         username = request.data.get('username')
         password = request.data.get('password')
         # Create a new user with the provided information
-        user = User.objects.create_user(username=username, password=password, is_active=False, is_superuser = False)
+        user = User.objects.create_user(username=username, password=password, is_active=False, is_superuser=False)
 
         token = Token.objects.create(user=user)
+
+        # Send a POST request to the credit service
+        status_code, response_text = create_user_credit_balance(user.id)
+        if status_code != 201:
+            print(f"Failed to create user credit balance for user {user.id}: {response_text}")
+        else:
+            print(f"User credit balance created for user {user.id}: {response_text}")
 
         return Response({"detail": "User created successfully. Activation required."}, status=status.HTTP_201_CREATED)
 

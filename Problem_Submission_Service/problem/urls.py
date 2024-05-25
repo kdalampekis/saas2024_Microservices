@@ -1,23 +1,38 @@
-"""
-URL configuration for analytics project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from problemService.views import MetadataCreateView, home, vehicle, job_shop, submit_problem, MetadataViewSet
+
+# Initialize the default router
+router = DefaultRouter()
+
+# Register MetadataViewSet with the router
+router.register(r'metadata', MetadataViewSet, basename='metadata')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('submissions/', include('submission_app.urls')),
+    # Include router URLs
+    path('', include(router.urls)),
+    # Custom paths
+    path('', home, name='home'),  # Root path of the app
+    path('vehicle_problem_submission/', vehicle, name='vehicle'),  # Corrected typo in the path
+    path('job_shop_problem_submission/', job_shop, name='job-shop'),  # Corrected typo in the path
+    path('problem_submission/<str:problem_name>/', submit_problem, name='submit_problem'),
+    path('solver-models/<int:model_id>/create-metadata/', MetadataCreateView.as_view(), name='metadata-create'),
 ]
+
+# Note: No need to manually define the 'list' or 'delete' for Metadata as the router handles it.
+
+"""
+Για να βαλεις στη βαση ενα καινουριο submission θελεις ενα url της μορφης:
+
+http://localhost:8003/solver-models/1/create-metadata/ (αυτο αφορα το μοντελο με id=1)
+
+και του δινεις ενα body της μορφης:
+{
+    "username": "sere",
+}
+
+Στο frontend θα συσχετισετε τα προβληματα με τα αντιστοιχα credits τους, οποτε εχοντας το id στο url
+θα ξερετε και το κοστος για να το περασετε στο body.
+"""
