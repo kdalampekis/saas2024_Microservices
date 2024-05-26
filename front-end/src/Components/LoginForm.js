@@ -42,11 +42,21 @@ function LoginForm() {
             console.log('Login Success:', data);
 
             localStorage.setItem('token', data.token);
-            navigate('/MySubmissions', { state: { username: form.username } });
+
+            if (data.is_superuser) {
+                navigate('/allsubmissions', { state: { username: form.username } });
+            } else {
+                navigate('/MySubmissions', { state: { username: form.username } });
+            }
         } catch (error) {
             console.error('Error:', error);
             setError('Invalid username or password');
         }
+    };
+
+    const handleGoogleLogin = () => {
+        // Redirect to the backend Google login URL
+        window.location.href = 'http://localhost:8007/accounts/login/google-oauth2/';
     };
 
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
@@ -75,6 +85,7 @@ function LoginForm() {
             <img src={logo} alt="solveMe Logo" className="center-logo" />
             {error && <div className="error-message">{error}</div>}
             <LoginGroup form={form} onChange={handleChange} onSubmit={handleSubmit} />
+            <button onClick={handleGoogleLogin} className="btn btn-google">Login with Google</button>
         </div>
     );
 }

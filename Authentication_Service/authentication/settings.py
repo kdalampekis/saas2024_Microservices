@@ -170,4 +170,5 @@ SOCIAL_AUTH_PIPELINE = (
     'authentication.pipeline.create_user_credit_balance_pipeline',
 )
 
-LOGIN_REDIRECT_URL = '/google'
+LOGIN_REDIRECT_URL = 'http://localhost:8080/MySubmissions'
+LOGOUT_REDIRECT_URL = '/'
