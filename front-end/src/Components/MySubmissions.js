@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function MySubmissions() {
     const location = useLocation();
     const navigate = useNavigate();
-    const username = location.state?.username || 24; // For testing, default to 24 if username is not provided
+    const username = location.state?.username || '24'; // For testing, default to 24 if username is not provided
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
     const [creditBalance, setCreditBalance] = useState(0);
     const [error, setError] = useState(null);
@@ -24,41 +24,31 @@ function MySubmissions() {
     useEffect(() => {
         const initializeAndFetchCreditBalance = async () => {
             try {
-                // Fetch user's credit balance to check if it exists
-                let fetchResponse = await fetch(`http://localhost:8002/credits/balance/${username}/`, {
+                // Initialize user's credit balance
+                const initializeResponse = await fetch(`http://localhost:8002/credits/initialize_user_credits/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ user_id: username }),
+                });
+
+                if (!initializeResponse.ok && initializeResponse.status !== 400) {
+                    throw new Error(`Failed to initialize credit balance: ${initializeResponse.statusText}`);
+                }
+
+                console.log('Initialization Success');
+
+                // Fetch user's credit balance after initialization
+                const fetchResponse = await fetch(`http://localhost:8002/credits/balance/${username}/`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                 });
 
-                if (fetchResponse.status === 404) {
-                    // If balance does not exist, initialize it
-                    const initializeResponse = await fetch(`http://localhost:8002/credits/initialize_user_credits/`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ user_id: username }),
-                    });
-
-                    if (!initializeResponse.ok) {
-                        throw new Error(`Failed to initialize credit balance: ${initializeResponse.statusText}`);
-                    }
-
-                    console.log('Initialization Success');
-
-                    // Fetch user's credit balance again after initialization
-                    fetchResponse = await fetch(`http://localhost:8002/credits/balance/${username}/`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-
-                    if (!fetchResponse.ok) {
-                        throw new Error(`Failed to fetch credit balance: ${fetchResponse.statusText}`);
-                    }
+                if (!fetchResponse.ok) {
+                    throw new Error(`Failed to fetch credit balance: ${fetchResponse.statusText}`);
                 }
 
                 const fetchData = await fetchResponse.json();

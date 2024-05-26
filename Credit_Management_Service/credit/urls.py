@@ -1,15 +1,12 @@
 from django.contrib import admin
 from django.urls import path, include
-
-from rest_framework.routers import DefaultRouter
-from creditService.views import *
-
+from creditService.views import GetBalanceView, PurchaseCreditsView, SpendCreditsView, InitializeUserCreditBalanceView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('credits/balance/<int:user_id>/', GetBalanceView.as_view(), name='get-balance'),
+    path('credits/balance/<str:user_id>/', GetBalanceView.as_view(), name='get-balance'),
     path('credits/purchase/', PurchaseCreditsView.as_view(), name='purchase-credits'),
-    path('credits/<int:user_id>/spend/', SpendCreditsView.as_view(), name='update-credits'),
+    path('credits/<str:user_id>/spend/', SpendCreditsView.as_view(), name='update-credits'),
     path('credits/initialize_user_credits/', InitializeUserCreditBalanceView.as_view(), name='initialize_user_credits'),
 ]
 
