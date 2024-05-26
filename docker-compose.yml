@@ -13,6 +13,12 @@ services:
       - user-db
     networks:
       - app-network
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
     volumes:
       - ./User_Management_Service:/app
 
@@ -39,6 +45,12 @@ services:
       - credit-db
     networks:
       - app-network
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
     volumes:
       - ./Credit_Management_Service:/app
 
@@ -70,6 +82,12 @@ services:
       - problem-db
     networks:
       - app-network
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
     volumes:
       - ./Problem_Submission_Service:/app
 
@@ -96,6 +114,12 @@ services:
       - computation-db
     networks:
       - app-network
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
     volumes:
       - ./Computation_Engine_Service:/app
 
@@ -122,6 +146,12 @@ services:
       - results-db
     networks:
       - app-network
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
     volumes:
       - ./Results_Management_Service:/app
 
@@ -148,6 +178,12 @@ services:
       - analytics-db
     networks:
       - app-network
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
     volumes:
       - ./Analytics_Logging_Service:/app
 
@@ -175,6 +211,12 @@ services:
         condition: service_healthy
     networks:
       - app-network
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
     volumes:
       - ./Authentication_Service:/app
 
@@ -208,14 +250,6 @@ services:
       - REACT_APP_BACKEND_URL=http://results-service:8005
       - REACT_APP_BACKEND_URL=http://analytics-service:8006
       - REACT_APP_BACKEND_URL=http://authentication-service:8007
-#    depends_on:
-#      - user-service
-#      - credit-service
-#      - problem-service
-#      - computation-service
-#      - results-service
-#      - analytics-service
-#      - authentication-service
 
 volumes:
   user_data:

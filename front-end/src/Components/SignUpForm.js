@@ -1,4 +1,3 @@
-// src/Components/SignUpForm.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,7 +7,9 @@ function SignUpForm() {
         email: '',
         password: ''
     });
-    const navigate = useNavigate(); // useNavigate replaces useHistory
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const navigate = useNavigate();
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -18,10 +19,37 @@ function SignUpForm() {
         }));
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log('User Registered:', form);
-        navigate('/login'); // navigate replaces history.push
+        console.log('User Registration Attempt:', form);
+
+        try {
+            const response = await fetch('http://localhost:8007/signup/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(form),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.detail || 'Signup failed');
+            }
+
+            const data = await response.json();
+            console.log('Registration Success:', data);
+            setSuccess('Registration successful! Please log in.');
+            setError('');
+
+            setTimeout(() => {
+                navigate('/login');
+            }, 2000);
+        } catch (error) {
+            console.error('Error:', error);
+            setError(error.message || 'Registration failed. Please try again.');
+            setSuccess('');
+        }
     };
 
     return (
@@ -63,6 +91,8 @@ function SignUpForm() {
                 </div>
                 <button type="submit">Sign Up</button>
             </form>
+            {error && <div className="error-message">{error}</div>}
+            {success && <div className="success-message">{success}</div>}
         </div>
     );
 }
