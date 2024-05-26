@@ -13,6 +13,8 @@ services:
       - user-db
     networks:
       - app-network
+    volumes:
+      - ./User_Management_Service:/app
 
   user-db:
     image: postgres
@@ -37,6 +39,8 @@ services:
       - credit-db
     networks:
       - app-network
+    volumes:
+      - ./Credit_Management_Service:/app
 
   credit-db:
     image: postgres
@@ -66,6 +70,8 @@ services:
       - problem-db
     networks:
       - app-network
+    volumes:
+      - ./Problem_Submission_Service:/app
 
   problem-db:
     image: postgres
@@ -90,6 +96,8 @@ services:
       - computation-db
     networks:
       - app-network
+    volumes:
+      - ./Computation_Engine_Service:/app
 
   computation-db:
     image: postgres
@@ -114,7 +122,8 @@ services:
       - results-db
     networks:
       - app-network
-  #      - computation-db
+    volumes:
+      - ./Results_Management_Service:/app
 
   results-db:
     image: postgres
@@ -139,6 +148,8 @@ services:
       - analytics-db
     networks:
       - app-network
+    volumes:
+      - ./Analytics_Logging_Service:/app
 
   analytics-db:
     image: postgres
@@ -164,7 +175,8 @@ services:
         condition: service_healthy
     networks:
       - app-network
-
+    volumes:
+      - ./Authentication_Service:/app
 
   authentication-db:
     image: postgres
@@ -183,8 +195,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-
 
   front-end:
     build: ./front-end

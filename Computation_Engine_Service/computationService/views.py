@@ -1,12 +1,9 @@
 import time
-
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-
-
 ################################################################
 import json
 import subprocess
@@ -17,11 +14,10 @@ import numpy as np
 ################################################################
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import *
 from rest_framework.decorators import api_view
 from rest_framework import status
 from .models import *
-
+from .serializers import *
 ################################################################
 from .Scripts.nQueens import solve_nqueens
 from .Scripts.vrpSolver import main
@@ -32,6 +28,17 @@ from .Scripts.mkp_solver import bin_packing_solver
 from .Scripts.maxFlow import max_flow_solver
 from .Scripts.sumAssignment import lin_sum_assignment
 ################################################################
+
+def home(request):
+    return HttpResponse("Welcome to My App!")
+
+
+
+def index(request):
+    return render(request, 'solver.html')
+
+
+
 def save_api_response(api_name, response_data,time_taken):
     # Create and save the ApiResponse object
     Results.objects.create(
@@ -39,6 +46,8 @@ def save_api_response(api_name, response_data,time_taken):
         response_data=response_data,
         time_taken=time_taken
     )
+
+
 
 @csrf_exempt
 def computation_view(request, problem_name):
@@ -61,6 +70,9 @@ def computation_view(request, problem_name):
     else:
         return JsonResponse({"error": "Invalid request method"}, status=405)
 
+
+
+# Sends all problem results from a specific category (or all of them, if no category is specified)
 @api_view(['GET'])
 def sent_data(request):
     # Get the 'name' parameter from the query parameters
@@ -71,6 +83,7 @@ def sent_data(request):
     else:
         incomes = Results.objects.all().values()
     return Response(incomes)
+
 
 
 def parse_and_save_data(result):
@@ -106,6 +119,8 @@ def parse_and_save_data(result):
 
     return objective,vehicles,routes,distances,maximum
 
+
+
 def save_route_data(objective, vehicles, routes, distances, maximum):
     if objective and vehicles and routes and distances and maximum:
         # Concatenate all route descriptions into one string
@@ -122,25 +137,20 @@ def save_route_data(objective, vehicles, routes, distances, maximum):
         # Join all routes into a single text field
         routes_text = "\n\n".join(route_descriptions)
         # Create a new problem record
-        Problems.objects.create(
+        VRP.objects.create(
             objective_id=int(objective[0]),
             number_of_vehicles=len(vehicles),
             routes=routes_text,
             maximum_distance=int(maximum[0].replace('m', ''))
         )
 
-def home(request):
-    return HttpResponse("Welcome to My App!")
 
-def index(request):
-    return render(request, 'solver.html')
 
 @csrf_exempt  # You can remove this if using CSRF tokens
 @api_view(["POST"])
 def solve_vrp(request):
     try:
         print("Received a POST request.")
-
         # Handle file upload
         json_file = request.FILES.get('locations_file')
         if json_file:
@@ -165,10 +175,12 @@ def solve_vrp(request):
         script_path = os.path.join(os.getcwd(), 'Scripts', 'vrpSolver.py')
         print(f"Script path: {script_path}")
 
+        start_time = time.time()
         result = subprocess.run(
             ['python', script_path, temp_file_path, number_of_locations, number_of_vehicles, vehicle_capacity],
             capture_output=True, text=True
         )
+        
         if result.stderr:
             print(f"Script errors: {result.stderr}")
             return Response({'error': result.stderr}, status=status.HTTP_400_BAD_REQUEST)
@@ -176,11 +188,25 @@ def solve_vrp(request):
         print("Script execution completed.")
         if result.stdout:
             print(f"Script output: {result.stdout}")
-            # Assuming parse_and_save_data is a function that processes the script output
+
+            # save into seperate "vrp" model
             objective, vehicles, routes, distances, maximum = parse_and_save_data(result.stdout)
             print(f"Parsed results: {objective}, {vehicles}, {routes}, {distances}, {maximum}")
-            save_route_data(objective, vehicles, routes, distances, maximum)
-        return Response({'result': result.stdout}, status=status.HTTP_200_OK)
+            save_route_data(objective, vehicles, routes, distances, maximum)    
+            
+            #save into general "problem" model
+            result = {
+                'result_id':objective,
+                'vehicles':vehicles,
+                'routes':routes,
+                'distances':distances,
+                'max_distance':maximum
+            }
+            # Measure end time and calculate duration
+            end_time = time.time()
+            duration = end_time - start_time
+            save_api_response('vrp_problem', result, duration)
+        return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         print(f"An error occurred: {str(e)}")
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -191,7 +217,6 @@ def solve_vrp(request):
 @csrf_exempt  # You can remove this if using CSRF tokens
 @api_view(['POST'])
 def nqueens_api(request):
-    print("I got into the queens_api view!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     try:
         # Extracting the board_size directly from request.POST
         board_size = request.POST.get('board_size')
@@ -228,6 +253,8 @@ def nqueens_api(request):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+
+
 @csrf_exempt
 @api_view(['POST'])
 def binpacking_api(request):
@@ -259,6 +286,8 @@ def binpacking_api(request):
     save_api_response('bin_packing', result,duration)
     return Response(result, status=status.HTTP_200_OK)
 
+
+
 @csrf_exempt
 @api_view(['POST'])
 def mip_problem_api(request):
@@ -281,7 +310,6 @@ def mip_problem_api(request):
     save_api_response('mip_problem', result,duration)
 
     return Response(result, status=status.HTTP_200_OK)
-
 
 
 
@@ -316,6 +344,8 @@ def linear_programming_api(request):
         return Response({"error": "Invalid JSON format in request data"}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 @csrf_exempt
 @api_view(['POST'])
@@ -377,6 +407,7 @@ def mkp_api(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
 @csrf_exempt
 @api_view(['POST'])
 def max_flow_api(request):
@@ -412,6 +443,7 @@ def max_flow_api(request):
         return Response({"error H": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
 @csrf_exempt
 @api_view(['POST'])
 def lin_sum_assignment_api(request):
@@ -442,5 +474,3 @@ def lin_sum_assignment_api(request):
         return Response({"error": "Invalid JSON format in request data"}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error H": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-

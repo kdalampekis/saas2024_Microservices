@@ -12,9 +12,9 @@ router.register(r'metadata', MetadataViewSet, basename='metadata')
 urlpatterns = [
     path('admin/', admin.site.urls),
     # Include router URLs
-    path('', include(router.urls)),
+    # path('', include(router.urls)),
     # Custom paths
-    path('', home, name='home'),  # Root path of the app
+    # path('', home, name='home'),  # Root path of the app
     path('vehicle_problem_submission/', vehicle, name='vehicle'),  # Corrected typo in the path
     path('job_shop_problem_submission/', job_shop, name='job-shop'),  # Corrected typo in the path
     path('problem_submission/<str:problem_name>/', submit_problem, name='submit_problem'),

@@ -1,21 +1,19 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status, generics
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
+import requests
 
 
 
 class LoginApiView(APIView):
     def post(self, request, *args, **kwargs):
-        print("post called")
-#         print("Request data:", request.data)
         username = request.data.get('username')
         password = request.data.get('password')
-#         print(request.data)
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
@@ -31,11 +29,9 @@ class LoginApiView(APIView):
             return Response({"error": "Invalid credentials"}, status=400)
 
     def get(self, request, *args, **kwargs):
-        print("get called")
         return render(request, "login.html")
 
 
-import requests
 
 def create_user_credit_balance(user_id):
     url = f"http://credit-service:8000/credits/initialize_user_credits/"
@@ -54,7 +50,6 @@ class SignUpApiView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        print("signup post called")
         username = request.data.get('username')
         password = request.data.get('password')
         # Create a new user with the provided information
@@ -73,7 +68,6 @@ class SignUpApiView(APIView):
 
     def get(self, request, *args, **kwargs):
         return render(request, "signup.html")
-
 
 
 
@@ -107,21 +101,13 @@ class GoogleApiView(APIView):
 
 
 
-
 # Custom logout function to test the google functionality
 # Replace with the LogoutApiView when testing with tokens
-from django.contrib.auth import logout
-from django.shortcuts import redirect
-
 def logout_view(request):
     logout(request)
     return redirect('/login')  # Redirects the user to the login page after logout
 
-from django.contrib.auth.models import User
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
+
 
 class UserDetailsView(APIView):
     permission_classes = [IsAuthenticated]

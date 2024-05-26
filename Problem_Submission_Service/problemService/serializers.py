@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Metadata
+from .models import *
 
 class MetadataSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
