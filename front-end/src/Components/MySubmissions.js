@@ -6,8 +6,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function MySubmissions() {
     const location = useLocation();
     const navigate = useNavigate();
-    const username = location.state?.username;
+    const username = location.state?.username || 24; // For testing, default to 24 if username is not provided
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
+    const [creditBalance, setCreditBalance] = useState(0);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -18,6 +20,58 @@ function MySubmissions() {
             clearInterval(timer);
         };
     }, []);
+
+    useEffect(() => {
+        const initializeAndFetchCreditBalance = async () => {
+            try {
+                // Fetch user's credit balance to check if it exists
+                let fetchResponse = await fetch(`http://localhost:8002/credits/balance/${username}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (fetchResponse.status === 404) {
+                    // If balance does not exist, initialize it
+                    const initializeResponse = await fetch(`http://localhost:8002/credits/initialize_user_credits/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ user_id: username }),
+                    });
+
+                    if (!initializeResponse.ok) {
+                        throw new Error(`Failed to initialize credit balance: ${initializeResponse.statusText}`);
+                    }
+
+                    console.log('Initialization Success');
+
+                    // Fetch user's credit balance again after initialization
+                    fetchResponse = await fetch(`http://localhost:8002/credits/balance/${username}/`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if (!fetchResponse.ok) {
+                        throw new Error(`Failed to fetch credit balance: ${fetchResponse.statusText}`);
+                    }
+                }
+
+                const fetchData = await fetchResponse.json();
+                console.log('Fetch Success:', fetchData);
+                setCreditBalance(fetchData.balance);
+            } catch (error) {
+                console.error('Error:', error);
+                setError(error.message);
+            }
+        };
+
+        initializeAndFetchCreditBalance();
+    }, [username]);
 
     // Example data for the table
     const submissions = [
@@ -42,6 +96,14 @@ function MySubmissions() {
                 <div className="date-time-box">
                     {currentDateTime.toLocaleDateString()} {currentDateTime.toLocaleTimeString()}
                 </div>
+            </div>
+            <div className="credit-balance-box">
+                <h2>Credit Balance</h2>
+                {error ? (
+                    <p>{error}</p>
+                ) : (
+                    <p>{creditBalance}</p>
+                )}
             </div>
             <div className="submissions-table">
                 <table>
@@ -71,12 +133,10 @@ function MySubmissions() {
                             <td>
                                 <button className="delete-button">Delete</button>
                             </td>
-
                         </tr>
                     ))}
                     </tbody>
                 </table>
-
             </div>
             <button className="new-problem-button" onClick={handleNewClick}>
                 New Problem

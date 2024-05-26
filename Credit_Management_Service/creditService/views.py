@@ -1,11 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from .models import CreditTransaction, UserCreditBalance
-from .serializers import *
+from .serializers import UserCreditBalanceSerializer, CreditTransactionSerializer
 import decimal
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -25,7 +24,6 @@ class GetBalanceView(APIView):
         return Response(serializer.data)
 
 
-
 User = get_user_model()
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -39,7 +37,7 @@ class InitializeUserCreditBalanceView(APIView):
             return Response({"detail": "User ID is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Ensure the user exists in the User table
-        user, created = User.objects.get_or_create(id=user_id, defaults={'username': user_id})
+        user, created = User.objects.get_or_create(username=user_id, defaults={'username': user_id})
 
         if created:
             # Optionally set other user fields if needed
@@ -48,7 +46,7 @@ class InitializeUserCreditBalanceView(APIView):
 
         # Create or get the UserCreditBalance
         user_credit_balance, created = UserCreditBalance.objects.get_or_create(
-            user_id=user.id,
+            user_id=user_id,  # Use the string user_id
             defaults={'balance': 0.00}
         )
 
@@ -60,7 +58,7 @@ class InitializeUserCreditBalanceView(APIView):
 
 
 class PurchaseCreditsView(APIView):
-#     permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = CreditTransactionSerializer(data=request.data)
@@ -75,11 +73,12 @@ class PurchaseCreditsView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class SpendCreditsView(APIView):
-#     permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request, user_id):
-        user = get_object_or_404(User, pk=user_id)
+        user = get_object_or_404(User, username=user_id)
         credits_to_spend = request.data.get('credits')
 
         if credits_to_spend is not None:
