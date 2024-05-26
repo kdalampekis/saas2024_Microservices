@@ -5,3 +5,4 @@ typing-extensions==4.11.0
 djangorestframework
 psycopg2-binary
 social-auth-app-django>=5.0
+django-cors-headers

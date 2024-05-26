@@ -13,6 +13,12 @@ services:
       - user-db
     networks:
       - app-network
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
 
   user-db:
     image: postgres
@@ -37,6 +43,12 @@ services:
       - credit-db
     networks:
       - app-network
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
 
   credit-db:
     image: postgres
@@ -66,6 +78,12 @@ services:
       - problem-db
     networks:
       - app-network
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
 
   problem-db:
     image: postgres
@@ -90,6 +108,12 @@ services:
       - computation-db
     networks:
       - app-network
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
 
   computation-db:
     image: postgres
@@ -114,7 +138,12 @@ services:
       - results-db
     networks:
       - app-network
-  #      - computation-db
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
 
   results-db:
     image: postgres
@@ -139,6 +168,12 @@ services:
       - analytics-db
     networks:
       - app-network
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
 
   analytics-db:
     image: postgres
@@ -164,7 +199,12 @@ services:
         condition: service_healthy
     networks:
       - app-network
-
+    command: >
+      sh -c "
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000
+      "
 
   authentication-db:
     image: postgres
@@ -184,8 +224,6 @@ services:
       timeout: 5s
       retries: 5
 
-
-
   front-end:
     build: ./front-end
     ports:
@@ -198,14 +236,6 @@ services:
       - REACT_APP_BACKEND_URL=http://results-service:8005
       - REACT_APP_BACKEND_URL=http://analytics-service:8006
       - REACT_APP_BACKEND_URL=http://authentication-service:8007
-#    depends_on:
-#      - user-service
-#      - credit-service
-#      - problem-service
-#      - computation-service
-#      - results-service
-#      - analytics-service
-#      - authentication-service
 
 volumes:
   user_data:

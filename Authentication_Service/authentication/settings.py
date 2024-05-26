@@ -27,6 +27,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = True  # Allow all origins for simplicity, restrict as needed
+# Alternatively, you can use:
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",  # React dev server
+# ]
 
 # Application definition
 
@@ -41,7 +47,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'social_django',
-    'django.contrib.sites'
+    'corsheaders',  # Add this line
+    'django.contrib.sites',
 ]
 
 SITE_ID = 1  # or the correct ID if different
@@ -49,6 +56,7 @@ SITE_ID = 1  # or the correct ID if different
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Add this line
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -161,11 +169,5 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
     'authentication.pipeline.create_user_credit_balance_pipeline',
 )
-
-
-
-
-
-
 
 LOGIN_REDIRECT_URL = '/google'

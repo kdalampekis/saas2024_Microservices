@@ -34,4 +34,3 @@ function LoginGroup({ form, onChange, onSubmit }) {
 }
 
 export default LoginGroup;
-

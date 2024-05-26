@@ -56,23 +56,33 @@ class SignUpApiView(APIView):
     def post(self, request):
         print("signup post called")
         username = request.data.get('username')
+        email = request.data.get('email')
         password = request.data.get('password')
-        # Create a new user with the provided information
-        user = User.objects.create_user(username=username, password=password, is_active=False, is_superuser=False)
 
-        token = Token.objects.create(user=user)
+        if not username or not email or not password:
+            return Response({"detail": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Send a POST request to the credit service
-        status_code, response_text = create_user_credit_balance(user.id)
-        if status_code != 201:
-            print(f"Failed to create user credit balance for user {user.id}: {response_text}")
-        else:
-            print(f"User credit balance created for user {user.id}: {response_text}")
+        if User.objects.filter(username=username).exists():
+            return Response({"detail": "Username already exists."}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"detail": "User created successfully. Activation required."}, status=status.HTTP_201_CREATED)
+        if User.objects.filter(email=email).exists():
+            return Response({"detail": "Email already registered."}, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, *args, **kwargs):
-        return render(request, "signup.html")
+        try:
+            user = User.objects.create_user(username=username, email=email, password=password, is_active=True, is_superuser=False)
+            token = Token.objects.create(user=user)
+
+            # Send a POST request to the credit service
+            status_code, response_text = create_user_credit_balance(user.id)
+            if status_code != 201:
+                print(f"Failed to create user credit balance for user {user.id}: {response_text}")
+            else:
+                print(f"User credit balance created for user {user.id}: {response_text}")
+
+            return Response({"detail": "User created successfully.", "token": token.key}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(f"Error during user creation: {e}")
+            return Response({"detail": "An error occurred during registration. Please try again later."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
