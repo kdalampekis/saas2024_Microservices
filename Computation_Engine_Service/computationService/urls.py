@@ -2,11 +2,8 @@ from django.urls import path
 from .views import *
 
 
-urlpatterns = [
-    # path('', home, name='home'),  # Root path of the app
-    path('solve', index, name='index'),
+urlpatterns = [   
     path('solve-vrp/', solve_vrp, name='solve-vrp'),
-
     path('queens/', nqueens_api, name='n-queens'),
     path('bin_packing/', binpacking_api, name='bin-packing'),
     path('linear_programming/', linear_programming_api, name='linear-programming'),
@@ -17,7 +14,5 @@ urlpatterns = [
     # Add more paths as needed
 
     path('sent_data/', sent_data, name='sent_data'),
-
-
-    path('problem_submission/', computation_view, name='computation_view'),
+    # path('problem_submission/', computation_view, name='computation_view'),
 ]

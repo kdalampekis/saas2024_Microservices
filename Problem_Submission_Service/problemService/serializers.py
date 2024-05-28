@@ -3,11 +3,11 @@ from .models import *
 
 class MetadataSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
-    problem_type_title = serializers.CharField(source='problem_type.title', read_only=True)
+    model_id_title = serializers.CharField(source='model_id.title', read_only=True)
 
     class Meta:
         model = Metadata
-        fields = ['submission_id', 'user', 'username', 'date', 'credit_cost', 'problem_type_title', 'status']
+        fields = ['submission_id', 'username', 'date', 'credit_cost', 'model_id', 'model_id_title', 'status']
 
     def get_status(self, obj):
         if obj.is_executed:

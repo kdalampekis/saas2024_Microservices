@@ -11,6 +11,7 @@ import os
 import re
 from .models import *
 import numpy as np
+import requests
 ################################################################
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -20,7 +21,7 @@ from .models import *
 from .serializers import *
 ################################################################
 from .Scripts.nQueens import solve_nqueens
-from .Scripts.vrpSolver import main
+# from ..Scripts.vrpSolver import main
 from .Scripts.binPacking import bin_packing
 from .Scripts.lpSolver import lp_solver
 from .Scripts.jobShop import job_shop_solver
@@ -29,61 +30,18 @@ from .Scripts.maxFlow import max_flow_solver
 from .Scripts.sumAssignment import lin_sum_assignment
 ################################################################
 
-def home(request):
-    return HttpResponse("Welcome to My App!")
-
-
-
-def index(request):
-    return render(request, 'solver.html')
-
-
-
-def save_api_response(api_name, response_data,time_taken):
+def save_api_response(submission_id, api_name, response_data,time_taken):
     # Create and save the ApiResponse object
     Results.objects.create(
+        submission_id=submission_id,
         problem_name=api_name,
         response_data=response_data,
         time_taken=time_taken
     )
-
-
-
-@csrf_exempt
-def computation_view(request, problem_name):
-    if request.method == 'POST':
-        try:
-            print("The problem name here is:",problem_name)
-            problem_views = {
-                'nqueens': nqueens_api,
-                # Add other problem views here
-            }
-
-            if problem_name in problem_views:
-                # Call the appropriate view function with the original request
-                return problem_views[problem_name](request)
-            else:
-                return JsonResponse({"error": "Unknown problem_name"}, status=400)
-        except Exception as e:
-            print(f"Error processing request: {e}")
-            return JsonResponse({"error": "Processing error"}, status=500)
-    else:
-        return JsonResponse({"error": "Invalid request method"}, status=405)
-
-
-
-# Sends all problem results from a specific category (or all of them, if no category is specified)
-@api_view(['GET'])
-def sent_data(request):
-    # Get the 'name' parameter from the query parameters
-    name = request.query_params.get('name', None)
-    if name:
-        print(name)
-        incomes = Results.objects.filter(problem_name=name).values()
-    else:
-        incomes = Results.objects.all().values()
-    return Response(incomes)
-
+    
+    # Update the metadata status to 'executed'
+    url = f"http://problem-service:8000/change_metadata_status/{submission_id}/"
+    requests.post(url)
 
 
 def parse_and_save_data(result):
@@ -120,7 +78,6 @@ def parse_and_save_data(result):
     return objective,vehicles,routes,distances,maximum
 
 
-
 def save_route_data(objective, vehicles, routes, distances, maximum):
     if objective and vehicles and routes and distances and maximum:
         # Concatenate all route descriptions into one string
@@ -146,7 +103,7 @@ def save_route_data(objective, vehicles, routes, distances, maximum):
 
 
 
-@csrf_exempt  # You can remove this if using CSRF tokens
+@csrf_exempt
 @api_view(["POST"])
 def solve_vrp(request):
     try:
@@ -172,9 +129,21 @@ def solve_vrp(request):
         print(f"Temporary JSON file created at {temp_file_path}")
 
         # Execute the Python script using subprocess
-        script_path = os.path.join(os.getcwd(), 'Scripts', 'vrpSolver.py')
+        script_path = os.path.join(os.getcwd(), 'computationService', 'Scripts', 'vrpSolver.py')
         print(f"Script path: {script_path}")
 
+
+        # Create a metadata instance
+        username = request.POST.get('username')
+        credit_cost = request.POST.get('credit_cost')
+        
+        url = f"http://problem-service:8000/solver-models/solve-vrp/create-metadata/"
+        data = {
+            "username": str(username),
+            "credit_cost": str(credit_cost)
+        }
+        response = requests.post(url, json=data)
+        
         start_time = time.time()
         result = subprocess.run(
             ['python', script_path, temp_file_path, number_of_locations, number_of_vehicles, vehicle_capacity],
@@ -203,9 +172,11 @@ def solve_vrp(request):
                 'max_distance':maximum
             }
             # Measure end time and calculate duration
+            submission_id = response.json()['submission_id']
+            name = response.json()['model_id_title']
             end_time = time.time()
             duration = end_time - start_time
-            save_api_response('vrp_problem', result, duration)
+            save_api_response(submission_id, name, result, duration)
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         print(f"An error occurred: {str(e)}")
@@ -213,8 +184,7 @@ def solve_vrp(request):
 
 
 
-
-@csrf_exempt  # You can remove this if using CSRF tokens
+@csrf_exempt
 @api_view(['POST'])
 def nqueens_api(request):
     try:
@@ -254,7 +224,6 @@ def nqueens_api(request):
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @csrf_exempt
 @api_view(['POST'])
 def binpacking_api(request):
@@ -287,7 +256,6 @@ def binpacking_api(request):
     return Response(result, status=status.HTTP_200_OK)
 
 
-
 @csrf_exempt
 @api_view(['POST'])
 def mip_problem_api(request):
@@ -310,7 +278,6 @@ def mip_problem_api(request):
     save_api_response('mip_problem', result,duration)
 
     return Response(result, status=status.HTTP_200_OK)
-
 
 
 @csrf_exempt
@@ -344,7 +311,6 @@ def linear_programming_api(request):
         return Response({"error": "Invalid JSON format in request data"}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 @csrf_exempt
@@ -407,7 +373,6 @@ def mkp_api(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
 @csrf_exempt
 @api_view(['POST'])
 def max_flow_api(request):
@@ -443,7 +408,6 @@ def max_flow_api(request):
         return Response({"error H": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
 @csrf_exempt
 @api_view(['POST'])
 def lin_sum_assignment_api(request):
@@ -474,3 +438,39 @@ def lin_sum_assignment_api(request):
         return Response({"error": "Invalid JSON format in request data"}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error H": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# Sends all problem results from a specific category (or all of them, if no category is specified)
+@api_view(['GET'])
+def sent_data(request):
+    # Get the 'name' parameter from the query parameters
+    name = request.query_params.get('name', None)
+    if name:
+        print(name)
+        incomes = Results.objects.filter(problem_name=name).values()
+    else:
+        incomes = Results.objects.all().values()
+    return Response(incomes)
+
+
+# Not useful, however it works
+@csrf_exempt
+def computation_view(request, problem_name):
+    if request.method == 'POST':
+        try:
+            print("The problem name here is:",problem_name)
+            problem_views = {
+                'nqueens': nqueens_api,
+                # Add other problem views here
+            }
+
+            if problem_name in problem_views:
+                # Call the appropriate view function with the original request
+                return problem_views[problem_name](request)
+            else:
+                return JsonResponse({"error": "Unknown problem_name"}, status=400)
+        except Exception as e:
+            print(f"Error processing request: {e}")
+            return JsonResponse({"error": "Processing error"}, status=500)
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=405)
