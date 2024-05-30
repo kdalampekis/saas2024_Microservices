@@ -21,8 +21,7 @@ class Metadata(models.Model):
     credit_cost = models.DecimalField(max_digits=10, decimal_places=2, help_text="The cost in credits for solving the problem")
     model_id = models.ForeignKey(SolverModel, on_delete=models.CASCADE, help_text="Reference to the Solver Model for problem type")
     is_executed = models.BooleanField(default=False)
-    is_ready = models.BooleanField(default=False)
-
+    is_ready = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.username} - {self.model_id.title} ({self.date.strftime('%Y-%m-%d %H:%M')})"
@@ -31,3 +30,15 @@ class Metadata(models.Model):
         verbose_name = "Metadata"
         verbose_name_plural = "Metadata Records"
         ordering = ['-date']
+
+class Input(models.Model):
+    metadata = models.ForeignKey(Metadata, related_name='inputs', on_delete=models.CASCADE, help_text="Reference to the Metadata")
+    input_file = models.FileField(upload_to='inputs/', null=True, blank=True, help_text="Input file for the problem")
+    input_data = models.JSONField(null=True, blank=True, help_text="Additional input data for the problem")
+
+    def __str__(self):
+        return f"Input ({self.input_file or self.input_data}) for {self.metadata}"
+    
+    class Meta:
+        verbose_name = "Input"
+        verbose_name_plural = "Inputs"

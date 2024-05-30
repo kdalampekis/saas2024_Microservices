@@ -26,14 +26,38 @@ class MetadataCreateView(APIView):
             logger.error(f'SolverModel with name {solver_name} not found')
             return Response({'error': 'SolverModel not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        data = request.data.copy()
-        data['model_id'] = solver_model.model_id
+        metadata_data = {
+            'username': request.data.get('username'),
+            'credit_cost': request.data.get('credit_cost'),
+            'model_id': solver_model.model_id
+        }
 
-        serializer = MetadataSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        metadata_serializer = MetadataSerializer(data=metadata_data)
+        if metadata_serializer.is_valid():
+            metadata = metadata_serializer.save()
+
+            # Exclude 'username', 'credit_cost', and files from input_data
+            input_data = {key: value for key, value in request.data.items() if key not in ['username', 'credit_cost'] and key not in request.FILES}
+
+            # Extract the file, if there is any
+            input_file = None
+            for file in request.FILES:
+                input_file = request.FILES[file]
+                print("file:", input_file)
+                break
+                
+            # If there is additional input data or a file, save it
+            if input_data or input_file:
+                input_serializer = InputSerializer(data={
+                    'metadata': metadata.submission_id,
+                    'input_data': input_data,
+                    'input_file': input_file
+                })
+                if input_serializer.is_valid():
+                    input_serializer.save()
+
+            return Response(metadata_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(metadata_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self, request, solver_name):
         logger.debug(f'Received GET request for SolverModel solver_name: {solver_name}')
@@ -47,7 +71,6 @@ class MetadataCreateView(APIView):
         metadata_entries = Metadata.objects.filter(model_id=solver_model.model_id)
         serializer = MetadataSerializer(metadata_entries, many=True)
         return Response(serializer.data)
-
 
 
 
@@ -78,50 +101,67 @@ class MetadataViewSet(viewsets.ModelViewSet):
 
 
 
-def vehicle(request):
-    return render(request, 'vehicle_solver.html')
-
-
-def job_shop(request):
-    return render(request, 'job_shop_solver.html')
-
-
 @api_view(['POST'])
-def submit_problem(request, problem_name):
+def submit_problem(request, sub_id):
     try:
-        # Collect all parameters from the request.POST dictionary
-        parameters = request.POST.dict()
-#         print(parameters)
-        if not problem_name:
-            return Response({"error": "problem_name is required"}, status=400)
-
+        metadata = get_object_or_404(Metadata, submission_id=sub_id)
+        # Change the status to 'not ready
+        metadata.is_ready = False
+        metadata.save()
+        
+        # Get the problem name, as written in the URL
+        problem_name = metadata.model_id.name
+        
+        # Get the inputs associated with the metadata
+        inputs = Input.objects.filter(metadata=metadata)
+        
+        if not inputs.exists():
+            return Response({"error": "No inputs found for this submission"}, status=400)
+        
         # Define the URL of the computation service
         url = f'http://computation-service:8000/computation/{problem_name}/'
 
-        # Send a POST request with form data to the computation service
-        response = requests.post(url, data=parameters)
+        # Prepare data and files for the request
+        data = {}
+        files = {}
+
+        for input in inputs:
+            if input.input_data:
+                data.update(input.input_data)
+            if input.input_file:
+                files[input.input_file.name] = input.input_file
+
+        data['submission_id'] = sub_id
+        data['name'] = metadata.model_id.title
+        
+        # Send a POST request with form data and files to the computation service
+        response = requests.post(url, data=data, files=files)
         response.raise_for_status()  # Raise an error for bad status codes
 
         # Parse the JSON response from the computation service
-        data = response.json()
-        return Response(data)  # Directly return the parsed JSON data
+        response_data = response.json()
+        return Response(response_data)  # Directly return the parsed JSON data
 
     except requests.exceptions.RequestException as e:
         # Handle request exceptions
-        print(f"Request error: {e}")
+        logger.error(f"Request error: {e}")
         return Response({"error": "Request error"}, status=500)
 
     except ValueError as e:
         # Handle JSON decode error
-        print(f"JSON decode error: {e}")
+        logger.error(f"JSON decode error: {e}")
         return Response({"error": "JSON decode error"}, status=500)
+    except Metadata.DoesNotExist:
+        return Response({"error": "Metadata not found"}, status=404)
+    except Input.DoesNotExist:
+        return Response({"error": "Input not found"}, status=404)
 
 
 
 def initialize_solver_models(request):
     if request.method == 'GET':
         solver_models = [
-            {"title": "Vehicle Routing Problem (VRP)", "name": "solve-vrp", "notes": "Solves the problem of routing vehicles to service a set of locations in an optimal manner."},
+            {"title": "Vehicle Routing Problem (VRP)", "name": "vrp", "notes": "Solves the problem of routing vehicles to service a set of locations in an optimal manner."},
             {"title": "N-Queens Problem", "name": "queens", "notes": "Solves the classic N-Queens puzzle, where N queens must be placed on an NxN chessboard such that no two queens attack each other."},
             {"title": "Bin Packing", "name": "bin_packing", "notes": "Solves the problem of packing objects of different volumes into a finite number of bins in a way that minimizes the number of bins used."},
             {"title": "Job Shop Scheduling", "name": "job_shop", "notes": "Solves the scheduling problem where a set of jobs are processed on a set of machines with the goal of optimizing production."},
@@ -150,7 +190,6 @@ def change_metadata_status(request, sub_id):
         meta = get_object_or_404(Metadata, submission_id=sub_id)
         
         # Update the metadata attributes
-        meta.is_ready = False
         meta.is_executed = True
         meta.save()
         
@@ -159,3 +198,12 @@ def change_metadata_status(request, sub_id):
     else:
         # Return a method not allowed response for non-POST requests
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+
+
+
+def vehicle(request):
+    return render(request, 'vehicle_solver.html')
+
+
+def job_shop(request):
+    return render(request, 'job_shop_solver.html')

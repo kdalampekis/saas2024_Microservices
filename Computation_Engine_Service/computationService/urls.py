@@ -2,8 +2,9 @@ from django.urls import path
 from .views import *
 
 
-urlpatterns = [   
-    path('solve-vrp/', solve_vrp, name='solve-vrp'),
+urlpatterns = [
+    # problem api
+    path('vrp/', vrp_api, name='solve-vrp'),
     path('queens/', nqueens_api, name='n-queens'),
     path('bin_packing/', binpacking_api, name='bin-packing'),
     path('linear_programming/', linear_programming_api, name='linear-programming'),
@@ -11,8 +12,9 @@ urlpatterns = [
     path('multiple_knapsack/', mkp_api, name='multiple-knapsack'),
     path('max_flow/', max_flow_api, name='max_flow'),
     path('lin_sum_assignment/', lin_sum_assignment_api, name='lin_sum_assignment'),
-    # Add more paths as needed
+    # Add more paths for other problems
 
+    # other api
     path('sent_data/', sent_data, name='sent_data'),
     # path('problem_submission/', computation_view, name='computation_view'),
 ]

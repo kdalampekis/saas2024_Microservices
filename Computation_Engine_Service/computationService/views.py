@@ -105,12 +105,13 @@ def save_route_data(objective, vehicles, routes, distances, maximum):
 
 @csrf_exempt
 @api_view(["POST"])
-def solve_vrp(request):
+def vrp_api(request):
     try:
         print("Received a POST request.")
+        
         # Handle file upload
-        json_file = request.FILES.get('locations_file')
-        if json_file:
+        if request.FILES:
+            json_file = next(iter(request.FILES.values()))
             json_data = json.load(json_file)
             print("JSON file successfully loaded.")
         else:
@@ -131,18 +132,6 @@ def solve_vrp(request):
         # Execute the Python script using subprocess
         script_path = os.path.join(os.getcwd(), 'computationService', 'Scripts', 'vrpSolver.py')
         print(f"Script path: {script_path}")
-
-
-        # Create a metadata instance
-        username = request.POST.get('username')
-        credit_cost = request.POST.get('credit_cost')
-        
-        url = f"http://problem-service:8000/solver-models/solve-vrp/create-metadata/"
-        data = {
-            "username": str(username),
-            "credit_cost": str(credit_cost)
-        }
-        response = requests.post(url, json=data)
         
         start_time = time.time()
         result = subprocess.run(
@@ -172,8 +161,8 @@ def solve_vrp(request):
                 'max_distance':maximum
             }
             # Measure end time and calculate duration
-            submission_id = response.json()['submission_id']
-            name = response.json()['model_id_title']
+            submission_id = request.POST.get('submission_id')
+            name = request.POST.get('name')
             end_time = time.time()
             duration = end_time - start_time
             save_api_response(submission_id, name, result, duration)
@@ -218,7 +207,9 @@ def nqueens_api(request):
              'solutions': solutions,
              'stats': stats
         }
-        save_api_response('n_queens', result,duration)
+        submission_id = request.POST.get('submission_id')
+        name = request.POST.get('name')
+        save_api_response(submission_id, name, result, duration)
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -252,7 +243,10 @@ def binpacking_api(request):
     result = bin_packing(weights, bin_capacity)
     end_time = time.time()
     duration = end_time - start_time
-    save_api_response('bin_packing', result,duration)
+    submission_id = request.POST.get('submission_id')
+    name = request.POST.get('name')
+    save_api_response(submission_id, name, result, duration)
+    
     return Response(result, status=status.HTTP_200_OK)
 
 
@@ -275,7 +269,9 @@ def mip_problem_api(request):
     result = mip_Problem(x_val, y_val)
     end_time = time.time()
     duration = end_time - start_time
-    save_api_response('mip_problem', result,duration)
+    submission_id = request.POST.get('submission_id')
+    name = request.POST.get('name')
+    save_api_response(submission_id, name, result, duration)
 
     return Response(result, status=status.HTTP_200_OK)
 
@@ -301,9 +297,9 @@ def linear_programming_api(request):
         result = lp_solver(constraints, objective_coeffs)
         end_time = time.time()
         duration = end_time - start_time
-        save_api_response('linear_programming', result,duration)
-        # Call the solver function
-
+        submission_id = request.POST.get('submission_id')
+        name = request.POST.get('name')
+        save_api_response(submission_id, name, result, duration)
 
         return Response(result, status=status.HTTP_200_OK)
 
@@ -329,8 +325,9 @@ def job_shop_api(request):
         result = job_shop_solver(jobs_data)
         end_time = time.time()
         duration = end_time - start_time
-        save_api_response('job_shop', result,duration)
-
+        submission_id = request.POST.get('submission_id')
+        name = request.POST.get('name')
+        save_api_response(submission_id, name, result, duration)
 
         return Response(result, status=status.HTTP_200_OK)
 
@@ -361,8 +358,9 @@ def mkp_api(request):
         result = bin_packing_solver(data)
         end_time = time.time()
         duration = end_time - start_time
-        save_api_response('bin_packing', result,duration)
-
+        submission_id = request.POST.get('submission_id')
+        name = request.POST.get('name')
+        save_api_response(submission_id, name, result, duration)
 
 
         return Response(result, status=status.HTTP_200_OK)
@@ -397,9 +395,10 @@ def max_flow_api(request):
 #         print(result)
         end_time = time.time()
         duration = end_time - start_time
-
-        save_api_response('max_flow', result,duration)
-
+        submission_id = request.POST.get('submission_id')
+        name = request.POST.get('name')
+        save_api_response(submission_id, name, result, duration)
+        
         return Response(result, status=status.HTTP_200_OK)
 
     except json.JSONDecodeError:
@@ -429,9 +428,9 @@ def lin_sum_assignment_api(request):
 #         print(result)
         end_time = time.time()
         duration = end_time - start_time
-
-        save_api_response('lin_sum_assignment', result,duration)
-
+        submission_id = request.POST.get('submission_id')
+        name = request.POST.get('name')
+        save_api_response(submission_id, name, result, duration)
         return Response(result, status=status.HTTP_200_OK)
 
     except json.JSONDecodeError:
