@@ -40,7 +40,7 @@ def save_api_response(submission_id, api_name, response_data,time_taken):
     )
     
     # Update the metadata status to 'executed'
-    url = f"http://problem-service:8000/change_metadata_status/{submission_id}/"
+    url = f"http://problem-service:8000/change_status/{submission_id}/"
     requests.post(url)
 
 

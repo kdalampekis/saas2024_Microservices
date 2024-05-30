@@ -158,7 +158,7 @@ def submit_problem(request, sub_id):
 
 
 
-def initialize_solver_models(request):
+def initialize_models(request):
     if request.method == 'GET':
         solver_models = [
             {"title": "Vehicle Routing Problem (VRP)", "name": "vrp", "notes": "Solves the problem of routing vehicles to service a set of locations in an optimal manner."},
@@ -184,7 +184,7 @@ def initialize_solver_models(request):
 
 
 @csrf_exempt
-def change_metadata_status(request, sub_id):
+def change_status(request, sub_id):
     if request.method == 'POST':
         # Retrieve the Metadata object with the given submission_id
         meta = get_object_or_404(Metadata, submission_id=sub_id)
