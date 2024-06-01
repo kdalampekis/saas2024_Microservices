@@ -1,9 +1,8 @@
 import time
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
 ################################################################
 import json
 import subprocess
@@ -40,7 +39,7 @@ def save_api_response(submission_id, api_name, response_data,time_taken):
     )
     
     # Update the metadata status to 'executed'
-    url = f"http://problem-service:8000/change_status/{submission_id}/"
+    url = f"http://problem-service:8000/problem/change_status/{submission_id}/"
     requests.post(url)
 
 
@@ -473,3 +472,19 @@ def computation_view(request, problem_name):
             return JsonResponse({"error": "Processing error"}, status=500)
     else:
         return JsonResponse({"error": "Invalid request method"}, status=405)
+
+
+
+@csrf_exempt
+def delete_result_view(request, sub_id):
+    if request.method == 'DELETE':
+        try:
+            result = get_object_or_404(Results, submission_id=sub_id)
+            result.delete()
+            return JsonResponse({'message': 'Result deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except Results.DoesNotExist:
+            return JsonResponse({'error': 'Result not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    else:
+        return JsonResponse({'error': 'Invalid HTTP method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)

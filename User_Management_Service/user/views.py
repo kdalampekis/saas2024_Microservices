@@ -1,5 +1,6 @@
 import requests
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 def fetch_submissions():
     try:
@@ -21,10 +22,10 @@ def submissions_view(request):
     return JsonResponse(submissions, safe=False)
 
 
-
+@csrf_exempt
 def delete_metadata_view(request, submission_id):
     if request.method == 'DELETE':
-        url = f"http://problem-service:8000/metadata/{submission_id}/delete/"
+        url = f"http://problem-service:8000/metadata/{submission_id}/delete_submission/"
         response = requests.delete(url)
         if response.status_code == 204:
             return JsonResponse({'message': 'Metadata successfully deleted.'}, status=204)

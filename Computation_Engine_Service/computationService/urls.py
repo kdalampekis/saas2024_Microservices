@@ -16,5 +16,6 @@ urlpatterns = [
 
     # other api
     path('sent_data/', sent_data, name='sent_data'),
+    path('delete_result/<int:sub_id>/', delete_result_view, name='delete_result_view'),
     # path('problem_submission/', computation_view, name='computation_view'),
 ]

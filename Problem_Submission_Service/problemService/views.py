@@ -94,7 +94,15 @@ class MetadataViewSet(viewsets.ModelViewSet):
         """
         try:
             metadata = Metadata.objects.get(submission_id=pk)
-            metadata.delete()
+            if metadata.is_ready:
+                metadata.delete()
+            elif metadata.is_executed:
+                print('Hello World')
+                url = f'http://computation-service:8000/computation/delete_result/{pk}/'
+                requests.delete(url)
+                metadata.delete()
+            else:
+                return Response({'message': 'Could not delete submission, file is processed'})
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Metadata.DoesNotExist:
             return Response({'error': 'Metadata not found'}, status=status.HTTP_404_NOT_FOUND)
