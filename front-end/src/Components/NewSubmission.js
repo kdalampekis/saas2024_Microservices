@@ -14,6 +14,8 @@ function NewSubmission() {
     const [inputDataValues, setInputDataValues] = useState({});
     const [submissionData, setSubmissionData] = useState(null);
 
+    console.log("Initial states set:", { selectedModel, currentMetadata, currentInputData, metadataValues, inputDataValues, submissionData });
+
     function Clock() {
         const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
@@ -126,20 +128,25 @@ function NewSubmission() {
 
     const handleModelSelection = (event) => {
         const selectedId = event.target.value;
-        const selected = solverModels.find(model => model.modelId === selectedId);
-        setSelectedModel(selected || { id: '', title: '' });
-        const modelData = selected ? (modelSpecificData[selectedId] || { metadata: [], inputData: [] }) : { metadata: [], inputData: [] };
-        setCurrentMetadata(modelData.metadata);
-        setCurrentInputData(modelData.inputData);
-        setMetadataValues({});
-        setInputDataValues({});
-        setSubmissionData(null); // Clear previous submission data on model change
+        const selectedModel = solverModels.find(model => model.modelId === selectedId);
+        setSelectedModel(selectedModel || { id: '', title: '' });
+        if (selectedModel) {
+            const modelData = modelSpecificData[selectedId] || { metadata: [], inputData: [] };
+            setCurrentMetadata(modelData.metadata);
+            setCurrentInputData(modelData.inputData);
+            setMetadataValues({});
+            setInputDataValues({});
+        } else {
+            setCurrentMetadata([]);
+            setCurrentInputData([]);
+        }
     };
+
 
     const handleSubmit = () => {
         const problemData = {
-            typeOfProblem: selectedModel.title,
-            inputData: {...inputDataValues}
+            typeOfProblem: selectedModel.title || 'No model selected',
+            inputData: { ...inputDataValues }
         };
         setSubmissionData(problemData);
     };
