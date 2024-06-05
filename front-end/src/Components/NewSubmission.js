@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../index.css';
 import logo2 from '../../src/topLogo.png';
@@ -10,11 +10,12 @@ function NewSubmission() {
     const [selectedModel, setSelectedModel] = useState({ id: '', title: '' });
     const [currentMetadata, setCurrentMetadata] = useState([]);
     const [currentInputData, setCurrentInputData] = useState([]);
-    const [metadataValues, setMetadataValues] = useState({});
-    const [inputDataValues, setInputDataValues] = useState({});
     const [submissionData, setSubmissionData] = useState(null);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [allFieldsFilled, setAllFieldsFilled] = useState(true);
 
-    console.log("Initial states set:", { selectedModel, currentMetadata, currentInputData, metadataValues, inputDataValues, submissionData });
+    const metadataRefs = useRef({});
+    const inputDataRefs = useRef({});
 
     function Clock() {
         const [currentDateTime, setCurrentDateTime] = useState(new Date());
@@ -32,21 +33,6 @@ function NewSubmission() {
             </div>
         );
     }
-
-
-    const handleMetadataChange = (id, value) => {
-        setMetadataValues(prev => ({
-            ...prev,
-            [id]: value
-        }));
-    };
-
-    const handleInputDataChange = (id, value) => {
-        setInputDataValues(prev => ({
-            ...prev,
-            [id]: value
-        }));
-    };
 
     const solverModels = [
         { modelId: '1', title: 'queens', notes: 'Solve the n-queens puzzle.' },
@@ -134,50 +120,69 @@ function NewSubmission() {
             const modelData = modelSpecificData[selectedId] || { metadata: [], inputData: [] };
             setCurrentMetadata(modelData.metadata);
             setCurrentInputData(modelData.inputData);
-            setMetadataValues({});
-            setInputDataValues({});
+            metadataRefs.current = {};
+            inputDataRefs.current = {};
         } else {
             setCurrentMetadata([]);
             setCurrentInputData([]);
         }
+        setAllFieldsFilled(true); // Reset allFieldsFilled to true
+        setErrorMessage(''); // Clear any existing error messages
     };
-
 
     const handleSubmit = () => {
+        const metadataValues = {};
+        let allFieldsFilled = true;
+
+        for (let key in metadataRefs.current) {
+            const value = metadataRefs.current[key].value;
+            metadataValues[currentMetadata.find(data => data.id === key).title] = value;
+            if (value === '') {
+                allFieldsFilled = false;
+            }
+        }
+
+        const inputDataValues = {};
+        for (let key in inputDataRefs.current) {
+            const value = inputDataRefs.current[key].value;
+            const inputDataField = currentInputData.find(data => data.id === key);
+            if (value === '') {
+                allFieldsFilled = false;
+            }
+            inputDataValues[inputDataField.title] = inputDataField.type === 'file' ? (inputDataRefs.current[key].files[0]?.name || '') : value;
+        }
+
+        setAllFieldsFilled(allFieldsFilled);
+
+        if (!allFieldsFilled) {
+            setErrorMessage('All the inputs must be filled');
+            return;
+        }
+
         const problemData = {
             typeOfProblem: selectedModel.title || 'No model selected',
-            inputData: { ...inputDataValues }
+            metadata: metadataValues,
+            inputData: inputDataValues
         };
         setSubmissionData(problemData);
+        setErrorMessage(''); // Clear error message if form is submitted successfully
     };
 
-    function InputComponent({ dataId, dataType, value, handleChange }) {
-        const inputKey = React.useMemo(() => `${dataId}-${dataType}`, [dataId, dataType]);  // Ensures stable key
+    const handleClear = () => {
+        setSubmissionData(null);
+        setAllFieldsFilled(true); // Reset allFieldsFilled to true
+        setErrorMessage(''); // Clear any existing error messages
+    };
+
+    function InputComponent({ dataId, dataType, inputRef }) {
         return (
             <input
-                key={inputKey}
                 type={dataType}
-                value={value}
-                //onChange={(e) => handleChange(dataId, dataType === 'file' ? e.target.files[0] : e.target.value)}
+                ref={inputRef}
                 className={dataType === 'file' ? 'file-input' : 'text-input'}
             />
         );
     }
-    currentInputData.map((data) => (
-        <tr key={data.id}>
-            <td>{data.id}</td>
-            <td>{data.title}</td>
-            <td>{data.uom}</td>
-            <td>
-                <InputComponent
-                    dataId={data.id}
-                    dataType={data.type || 'text'}
-                    value={inputDataValues[data.id] || ''}
-                    handleChange={handleInputDataChange}
-                />
-            </td>
-        </tr>
-    ))
 
     return (
         <div className="landing">
@@ -221,8 +226,7 @@ function NewSubmission() {
                                     <InputComponent
                                         dataId={data.id}
                                         dataType={data.type || 'text'}
-                                        value={metadataValues[data.id]}
-                                        handleChange={handleMetadataChange}
+                                        inputRef={el => metadataRefs.current[data.id] = el}
                                     />
                                 </td>
                             </tr>
@@ -251,8 +255,7 @@ function NewSubmission() {
                                     <InputComponent
                                         dataId={data.id}
                                         dataType={data.type || 'text'}
-                                        value={inputDataValues[data.id]}
-                                        handleChange={handleInputDataChange}
+                                        inputRef={el => inputDataRefs.current[data.id] = el}
                                     />
                                 </td>
                             </tr>
@@ -266,8 +269,13 @@ function NewSubmission() {
                 <h3>New problem submission for {selectedModel.title || '<model not selected>'}</h3>
                 <button className="upload-button" onClick={handleSubmit}>Create Submission Data</button>
                 <div className="form-buttons">
-                    <button className="cancel-button" onClick={() => setSubmissionData(null)}>Clear</button>
+                    <button className="cancel-button" onClick={handleClear}>Clear</button>
                 </div>
+                {errorMessage && (
+                    <div className="error-message">
+                        <p>{errorMessage}</p>
+                    </div>
+                )}
                 {submissionData && (
                     <div className="submission-data">
                         <h4>Submission Data:</h4>
@@ -276,17 +284,7 @@ function NewSubmission() {
                 )}
             </div>
         </div>
-
-/*        <div className="submission-section">
-            <h3>New problem submission for {selectedModel.title || '<model not selected>'}</h3>
-            <button className="upload-button">Upload submission metadata</button>
-             <div className="form-buttons">
-            <Link to="/EditSubmission" className="create-button">Create</Link>
-            <button className="cancel-button">Cancel</button>
-            </div>
-            </div>
-    <   /div>*/
-);
+    );
 }
 
 export default NewSubmission;
