@@ -16,12 +16,9 @@ class CreditTransaction(models.Model):
         ordering = ['-created_at']  # Orders the transactions by creation time, newest first
 
 
-
-from django.db import models
-
 class UserCreditBalance(models.Model):
-    user_id = models.IntegerField(unique=True, help_text="The user ID associated with this balance")
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="The current credit balance of the user")
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    balance = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"User ID {self.user_id} has a balance of {self.balance} credits"

@@ -1,11 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from .models import CreditTransaction, UserCreditBalance
-from .serializers import *
+from .serializers import UserCreditBalanceSerializer, CreditTransactionSerializer
 import decimal
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -17,13 +16,13 @@ class GetBalanceView(APIView):
 
     def get(self, request, user_id):
         try:
-            user_credit_balance = UserCreditBalance.objects.get(user_id=user_id)
+            user = get_object_or_404(User, username=user_id)
+            user_credit_balance = UserCreditBalance.objects.get(user=user)
         except UserCreditBalance.DoesNotExist:
             return Response({"detail": f"User {user_id} not found"}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = UserCreditBalanceSerializer(user_credit_balance)
         return Response(serializer.data)
-
 
 
 User = get_user_model()
@@ -39,28 +38,30 @@ class InitializeUserCreditBalanceView(APIView):
             return Response({"detail": "User ID is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Ensure the user exists in the User table
-        user, created = User.objects.get_or_create(id=user_id, defaults={'username': user_id})
-
-        if created:
-            # Optionally set other user fields if needed
+        try:
+            user = User.objects.get(username=user_id)
+        except User.DoesNotExist:
+            user = User(username=user_id)
             user.set_password(User.objects.make_random_password())
             user.save()
 
         # Create or get the UserCreditBalance
         user_credit_balance, created = UserCreditBalance.objects.get_or_create(
-            user_id=user.id,
+            user=user,
             defaults={'balance': 0.00}
         )
 
         if not created:
-            return Response({"detail": "User credit balance already exists"}, status=status.HTTP_400_BAD_REQUEST)
+            print("User credit balance already exists")
+            serializer = UserCreditBalanceSerializer(user_credit_balance)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
         serializer = UserCreditBalanceSerializer(user_credit_balance)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class PurchaseCreditsView(APIView):
-#     permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = CreditTransactionSerializer(data=request.data)
@@ -68,18 +69,19 @@ class PurchaseCreditsView(APIView):
             transaction = serializer.save()
 
             # Update the user's credit balance
-            user_credit_balance, created = UserCreditBalance.objects.get_or_create(user_id=transaction.user_id)
+            user_credit_balance, created = UserCreditBalance.objects.get_or_create(user=transaction.user)
             user_credit_balance.balance += transaction.credits
             user_credit_balance.save()
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class SpendCreditsView(APIView):
-#     permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def post(self, request, user_id):
-        user = get_object_or_404(User, pk=user_id)
+        user = get_object_or_404(User, username=user_id)
         credits_to_spend = request.data.get('credits')
 
         if credits_to_spend is not None:

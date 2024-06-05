@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-@p58p=hb%ye-cu$l*&7m1$9#*_(x&0ie*$*m@fut=d24w*$4#s
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Application definition
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'creditService',
     'rest_framework',
+    'corsheaders',
 ]
 import os
 MIDDLEWARE = [
@@ -50,7 +51,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'creditService.middleware.CsrfExemptMiddleware',  # Add your custom middleware here
-
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 
