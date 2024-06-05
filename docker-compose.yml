@@ -19,6 +19,8 @@ services:
         python manage.py migrate &&
         python manage.py runserver 0.0.0.0:8000
       "
+    volumes:
+      - ./User_Management_Service:/app
 
   user-db:
     image: postgres
@@ -49,6 +51,8 @@ services:
         python manage.py migrate &&
         python manage.py runserver 0.0.0.0:8000
       "
+    volumes:
+      - ./Credit_Management_Service:/app
 
   credit-db:
     image: postgres
@@ -84,6 +88,8 @@ services:
         python manage.py migrate &&
         python manage.py runserver 0.0.0.0:8000
       "
+    volumes:
+      - ./Problem_Submission_Service:/app
 
   problem-db:
     image: postgres
@@ -114,6 +120,8 @@ services:
         python manage.py migrate &&
         python manage.py runserver 0.0.0.0:8000
       "
+    volumes:
+      - ./Computation_Engine_Service:/app
 
   computation-db:
     image: postgres
@@ -144,6 +152,8 @@ services:
         python manage.py migrate &&
         python manage.py runserver 0.0.0.0:8000
       "
+    volumes:
+      - ./Results_Management_Service:/app
 
   results-db:
     image: postgres
@@ -174,6 +184,8 @@ services:
         python manage.py migrate &&
         python manage.py runserver 0.0.0.0:8000
       "
+    volumes:
+      - ./Analytics_Logging_Service:/app
 
   analytics-db:
     image: postgres
@@ -205,6 +217,8 @@ services:
         python manage.py migrate &&
         python manage.py runserver 0.0.0.0:8000
       "
+    volumes:
+      - ./Authentication_Service:/app
 
   authentication-db:
     image: postgres

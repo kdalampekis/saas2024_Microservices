@@ -19,7 +19,7 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('computation/', include('computation_app.urls')),  # Use string to reference URLs
+    path('computation/', include('computationService.urls')),  # Use string to reference URLs
 ]
 
 

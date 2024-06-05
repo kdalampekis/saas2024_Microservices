@@ -15,10 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.contrib import admin
 from django.urls import path
 from .views import submissions_view, delete_metadata_view
 
 urlpatterns = [
+    path('admin/', admin.site.urls),
     path('submissions/', submissions_view, name='submissions'),
     path('metadata/delete/<int:submission_id>/', delete_metadata_view, name='delete-metadata'),
 ]
