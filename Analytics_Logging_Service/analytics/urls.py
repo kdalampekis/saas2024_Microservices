@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from analyticsService.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('submissions/<str:username>/', user_submissions, name='user_submissions'),
 ]

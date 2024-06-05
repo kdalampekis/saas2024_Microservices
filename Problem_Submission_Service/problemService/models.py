@@ -1,9 +1,9 @@
 from django.db import models
-from django.utils import timezone
 
 class SolverModel(models.Model):
     model_id = models.AutoField(primary_key=True, help_text="Unique identifier for the solver model")
     title = models.CharField(max_length=200, help_text="Title of the solver model")
+    name = models.CharField(max_length=200, help_text="Name of the problem, as it is written in the url")
     notes = models.TextField(help_text="Notes about the solver model")
 
     def __str__(self):
@@ -16,19 +16,29 @@ class SolverModel(models.Model):
 
 class Metadata(models.Model):
     submission_id = models.AutoField(primary_key=True, help_text="Unique identifier for the submission")
-    name = models.CharField(max_length=200, help_text="The name of submission")
     username = models.CharField(max_length=100, help_text="The username of the user involved in the problem")
     date = models.DateTimeField(auto_now_add=True, help_text="The date and time when the metadata was recorded")
     credit_cost = models.DecimalField(max_digits=10, decimal_places=2, help_text="The cost in credits for solving the problem")
-    problem_type = models.ForeignKey(SolverModel, on_delete=models.CASCADE, related_name='metadata_problem_type', help_text="Reference to the Solver Model for problem type")
+    model_id = models.ForeignKey(SolverModel, on_delete=models.CASCADE, help_text="Reference to the Solver Model for problem type")
     is_executed = models.BooleanField(default=False)
-    is_ready = models.BooleanField(default=False)
-
+    is_ready = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.username} - {self.problem_type.title} ({self.date.strftime('%Y-%m-%d %H:%M')})"
+        return f"{self.username} - {self.model_id.title} ({self.date.strftime('%Y-%m-%d %H:%M')})"
 
     class Meta:
         verbose_name = "Metadata"
         verbose_name_plural = "Metadata Records"
         ordering = ['-date']
+
+class Input(models.Model):
+    metadata = models.ForeignKey(Metadata, related_name='inputs', on_delete=models.CASCADE, help_text="Reference to the Metadata")
+    input_file = models.FileField(upload_to='inputs/', null=True, blank=True, help_text="Input file for the problem")
+    input_data = models.JSONField(null=True, blank=True, help_text="Additional input data for the problem")
+
+    def __str__(self):
+        return f"Input ({self.input_file or self.input_data}) for {self.metadata}"
+    
+    class Meta:
+        verbose_name = "Input"
+        verbose_name_plural = "Inputs"
