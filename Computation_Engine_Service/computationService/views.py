@@ -12,7 +12,6 @@ from .models import *
 import numpy as np
 import requests
 ################################################################
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -20,7 +19,6 @@ from .models import *
 from .serializers import *
 ################################################################
 from .Scripts.nQueens import solve_nqueens
-# from ..Scripts.vrpSolver import main
 from .Scripts.binPacking import bin_packing
 from .Scripts.lpSolver import lp_solver
 from .Scripts.jobShop import job_shop_solver
@@ -251,32 +249,6 @@ def binpacking_api(request):
 
 @csrf_exempt
 @api_view(['POST'])
-def mip_problem_api(request):
-    x_val = request.POST.get('x')
-    y_val = request.POST.get('y')
-
-    if x_val is None or y_val is None:
-        return Response({'error': 'Both x and y values are required.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    try:
-        x_val = int(x_val)
-        y_val = int(y_val)
-    except ValueError:
-        return Response({'error': 'Both x and y must be numbers.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    start_time = time.time()
-    result = mip_Problem(x_val, y_val)
-    end_time = time.time()
-    duration = end_time - start_time
-    submission_id = request.POST.get('submission_id')
-    name = request.POST.get('name')
-    save_api_response(submission_id, name, result, duration)
-
-    return Response(result, status=status.HTTP_200_OK)
-
-
-@csrf_exempt
-@api_view(['POST'])
 def linear_programming_api(request):
     try:
         # Get the JSON data from the request
@@ -391,7 +363,6 @@ def max_flow_api(request):
 
         start_time = time.time()
         result = max_flow_solver(start_nodes, end_nodes ,capacities, source, sink)
-#         print(result)
         end_time = time.time()
         duration = end_time - start_time
         submission_id = request.POST.get('submission_id')
@@ -418,13 +389,10 @@ def lin_sum_assignment_api(request):
         # Convert jobs_data from JSON string to Python list
         costs = np.array(json.loads(costs_str))
 
-#         costs = json.loads(request.POST.get('costs'))
-        # Print the received data
         print("costs:", costs)
 
         start_time = time.time()
         result = lin_sum_assignment(costs)
-#         print(result)
         end_time = time.time()
         duration = end_time - start_time
         submission_id = request.POST.get('submission_id')
@@ -438,6 +406,7 @@ def lin_sum_assignment_api(request):
         return Response({"error H": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
 # Sends all problem results from a specific category (or all of them, if no category is specified)
 @api_view(['GET'])
 def sent_data(request):
@@ -449,6 +418,22 @@ def sent_data(request):
     else:
         incomes = Results.objects.all().values()
     return Response(incomes)
+
+
+# Deletes the results of a problem (should not be called by itself, only through /metadata/delete)
+@csrf_exempt
+def delete_result_view(request, sub_id):
+    if request.method == 'DELETE':
+        try:
+            result = get_object_or_404(Results, submission_id=sub_id)
+            result.delete()
+            return JsonResponse({'message': 'Result deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except Results.DoesNotExist:
+            return JsonResponse({'error': 'Result not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    else:
+        return JsonResponse({'error': 'Invalid HTTP method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 # Not useful, however it works
@@ -472,19 +457,3 @@ def computation_view(request, problem_name):
             return JsonResponse({"error": "Processing error"}, status=500)
     else:
         return JsonResponse({"error": "Invalid request method"}, status=405)
-
-
-
-@csrf_exempt
-def delete_result_view(request, sub_id):
-    if request.method == 'DELETE':
-        try:
-            result = get_object_or_404(Results, submission_id=sub_id)
-            result.delete()
-            return JsonResponse({'message': 'Result deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-        except Results.DoesNotExist:
-            return JsonResponse({'error': 'Result not found'}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    else:
-        return JsonResponse({'error': 'Invalid HTTP method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -8,21 +8,15 @@ urlpatterns = [
     path('submit_problem/<int:sub_id>/', submit_problem),    # sends the submission <int:id> for computing
     path('change_status/<int:sub_id>/', change_status),     # changes a metadata status to 'executed'
     
-    path('vehicle_problem_submission/', vehicle, name='vehicle'),
+    path('vehicle_problem_submission/', vehicle),   # test html page for vrp
+    path('job_shop_submission', job_shop)   # test html page job_shop
 ]
 
 
 """
-Για να βαλεις στη βαση ενα καινουριο submission θελεις ενα url της μορφης:
+To create a new metadata instance for problem <str:solver_name> go to url:
+http://localhost:8003/problem/create-metadata/<str:solver_name>/
 
-http://localhost:8003/problem/create-metadata/vrp/ (αυτο αφορα το μοντελο με name=vrp)
-
-και του δινεις ενα body της μορφης:
-{
-    "username": "sere",
-    "credit_cost": "20"
-}
-
-Στο frontend θα συσχετισετε τα προβληματα με τα αντιστοιχα credits τους, οποτε εχοντας το id στο url
-θα ξερετε και το κοστος για να το περασετε στο body.
+To run the problem based on the metadata and the input go to url:
+http://localhost:8003/problem/submit_problem/<int:sub_id>/
 """

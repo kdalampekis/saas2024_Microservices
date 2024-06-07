@@ -1,0 +1,701 @@
+{
+	"info": {
+		"_postman_id": "844c2b88-e7d9-4eae-b267-8cd4567f1747",
+		"name": "Problem APIs",
+		"description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" alt=\"\" height=\"1530\" width=\"2162\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33192029"
+	},
+	"item": [
+		{
+			"name": "Create VRP Metadata",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "sere",
+							"type": "text"
+						},
+						{
+							"key": "credit_cost",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "locations_file",
+							"type": "file",
+							"src": "/C:/Users/Steli/OneDrive/Υπολογιστής/locations_20.json"
+						},
+						{
+							"key": "number_of_locations",
+							"value": "20",
+							"type": "text"
+						},
+						{
+							"key": "number_of_vehicles",
+							"value": "5",
+							"type": "text"
+						},
+						{
+							"key": "vehicle_capacity",
+							"value": "10000",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8003/problem/create-metadata/vrp/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"create-metadata",
+						"vrp",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit VRP Problem",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8003/problem/submit_problem/1/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"submit_problem",
+						"1",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create NQueens Metadata",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "sere",
+							"type": "text"
+						},
+						{
+							"key": "credit_cost",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "board_size",
+							"value": "8",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8003/problem/create-metadata/queens/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"create-metadata",
+						"queens",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit NQueens Problem",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8003/problem/submit_problem/2/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"submit_problem",
+						"2",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create BinPacking Metadata",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "sere",
+							"type": "text"
+						},
+						{
+							"key": "credit_cost",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "weights",
+							"value": "48, 30, 19, 36, 36, 27, 42, 42, 36, 24, 30",
+							"type": "text"
+						},
+						{
+							"key": "bin_capacity",
+							"value": "100",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8003/problem/create-metadata/bin_packing/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"create-metadata",
+						"bin_packing",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit BinPacking Problem",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8003/problem/submit_problem/3/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"submit_problem",
+						"3",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create LinearProgramming Metadata",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "sere",
+							"type": "text"
+						},
+						{
+							"key": "credit_cost",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "objective_coeffs",
+							"value": "[3, 6]",
+							"type": "text"
+						},
+						{
+							"key": "constraints_coeffs",
+							"value": "[[1, 2], [3, -1], [1, -1]]",
+							"type": "text"
+						},
+						{
+							"key": "bounds",
+							"value": "[14, 0, 2]",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8003/problem/create-metadata/linear_programming/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"create-metadata",
+						"linear_programming",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit LinearProgramming Problem",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8003/problem/submit_problem/4/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"submit_problem",
+						"4",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create JobShop Metadata",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "sere",
+							"type": "text"
+						},
+						{
+							"key": "credit_cost",
+							"value": "30",
+							"type": "text"
+						},
+						{
+							"key": "jobs_data",
+							"value": "[[[0, 3], [1, 2], [2, 2]], [[0, 2], [2, 1], [1, 4]], [[1, 4], [2, 3]]]",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8003/problem/create-metadata/job_shop/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"create-metadata",
+						"job_shop",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit JobShop Problem",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8003/problem/submit_problem/5/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"submit_problem",
+						"5",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create MultipleKnapsack Metadata",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "sere",
+							"type": "text"
+						},
+						{
+							"key": "credit_cost",
+							"value": "200",
+							"type": "text"
+						},
+						{
+							"key": "weights",
+							"value": "[48, 30, 42, 36, 36, 27, 19, 42, 24, 30]",
+							"type": "text"
+						},
+						{
+							"key": "values",
+							"value": "[10, 40, 30, 50, 35, 40, 30, 20, 25, 15]",
+							"type": "text"
+						},
+						{
+							"key": "bin_capacity",
+							"value": "100",
+							"type": "text"
+						},
+						{
+							"key": "num_bins",
+							"value": "5",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8003/problem/create-metadata/multiple_knapsack/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"create-metadata",
+						"multiple_knapsack",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit MultipleKnapsack Problem",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8003/problem/submit_problem/6/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"submit_problem",
+						"6",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create MaxFlow Metadata",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "sere",
+							"type": "text"
+						},
+						{
+							"key": "credit_cost",
+							"value": "10",
+							"type": "text"
+						},
+						{
+							"key": "start_nodes",
+							"value": "[0, 0, 0, 1, 1, 2, 2, 3, 3]",
+							"type": "text"
+						},
+						{
+							"key": "end_nodes",
+							"value": "[1, 2, 3, 2, 4, 3, 4, 2, 4]",
+							"type": "text"
+						},
+						{
+							"key": "capacities",
+							"value": "[20, 2, 10, 40, 30, 10, 20, 5, 20]",
+							"type": "text"
+						},
+						{
+							"key": "source",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "sink",
+							"value": "4",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8003/problem/create-metadata/max_flow/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"create-metadata",
+						"max_flow",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit MaxFlow Problem",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8003/problem/submit_problem/7/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"submit_problem",
+						"7",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create LinearAssignment Problem",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "sere",
+							"type": "text"
+						},
+						{
+							"key": "credit_cost",
+							"value": "25",
+							"type": "text"
+						},
+						{
+							"key": "costs",
+							"value": "[[90, 76, 75, 70],[35, 85, 55, 65],[125, 95, 90, 105],[45, 110, 95, 115]]",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8003/problem/create-metadata/lin_sum_assignment/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"create-metadata",
+						"lin_sum_assignment",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit LinearAssignment Problem",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8003/problem/submit_problem/8/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"submit_problem",
+						"8",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Initialize models",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8003/problem/initialize_models/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8003",
+					"path": [
+						"problem",
+						"initialize_models",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View All User Submissions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8006/submissions/sere/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8006",
+					"path": [
+						"submissions",
+						"sere",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "View All Submissions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8001/submissions",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"submissions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Metadata",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8001/metadata/delete/7/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8001",
+					"path": [
+						"metadata",
+						"delete",
+						"7",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "https://postman-rest-api-learner.glitch.me/"
+		}
+	]
+}
