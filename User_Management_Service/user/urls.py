@@ -24,4 +24,3 @@ urlpatterns = [
     path('submissions/', submissions_view, name='submissions'),
     path('metadata/delete/<int:submission_id>/', delete_metadata_view, name='delete-metadata'),
 ]
-
