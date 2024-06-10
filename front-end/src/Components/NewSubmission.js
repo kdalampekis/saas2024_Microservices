@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../index.css';
 import logo2 from '../../src/topLogo.png';
 
 function NewSubmission() {
     const location = useLocation();
     const username = location.state?.username;
+    const navigate = useNavigate();
 
     const [selectedModel, setSelectedModel] = useState({ id: '', title: '' });
     const [currentMetadata, setCurrentMetadata] = useState([]);
@@ -35,8 +36,8 @@ function NewSubmission() {
     }
 
     const solverModels = [
-        { modelId: '1', title: 'queens', notes: 'Solve the n-queens puzzle.' },
-        { modelId: '2', title: 'solve-vrp', notes: 'Optimize vehicle routing paths.' },
+        { modelId: '1', title: 'solve-vrp', notes: 'Optimize vehicle routing paths.' },
+        { modelId: '2', title: 'queens', notes: 'Solve the n-queens puzzle.' },
         { modelId: '3', title: 'bin_packing', notes: 'Optimize bin packing using weights.' },
         { modelId: '4', title: 'linear_programming', notes: 'Solve linear programming problems.' },
         { modelId: '5', title: 'job_shop', notes: 'Optimize job shop scheduling.' },
@@ -46,15 +47,7 @@ function NewSubmission() {
     ];
 
     const modelSpecificData = {
-        '1': { // Model ID for 'queens'
-            metadata: [
-                { id: '001', title: 'Chessboard Size', uom: 'Squares', type: 'number' }
-            ],
-            inputData: [
-                { id: '101', title: 'Starting Position', uom: 'Coordinates', type: 'text' } // Assuming text format for simplicity
-            ]
-        },
-        '2': { // Model ID for 'solve-vrp'
+        '1': { // Model ID for 'solve-vrp'
             metadata: [
                 { id: '002', title: 'Vehicle Counts', uom: 'Vehicles', type: 'number' }
             ],
@@ -64,6 +57,15 @@ function NewSubmission() {
                 { id: '104', title: 'Vehicles Capacity', uom: 'Capacity', type: 'number' }
             ]
         },
+        '2': { // Model ID for 'queens'
+            metadata: [
+                { id: '001', title: 'Chessboard Size', uom: 'Squares', type: 'number' }
+            ],
+            inputData: [
+                { id: '101', title: 'Starting Position', uom: 'Coordinates', type: 'text' } // Assuming text format for simplicity
+            ]
+        },
+
         '3': { // Model ID for 'bin_packing'
             metadata: [],
             inputData: [
@@ -112,6 +114,28 @@ function NewSubmission() {
         }
     };
 
+    const SubmitApiEndpoints = {
+        '1': 'http://localhost:8003/problem/submit_problem/1/',
+        '2': 'http://localhost:8003/problem/submit_problem/2/',
+        '3': 'http://localhost:8003/problem/submit_problem/3/',
+        '4': 'http://localhost:8003/problem/submit_problem/4/',
+        '5': 'http://localhost:8003/problem/submit_problem/5/',
+        '6': 'http://localhost:8003/problem/submit_problem/6/',
+        '7': 'http://localhost:8003/problem/submit_problem/7/',
+        '8': 'http://localhost:8003/problem/submit_problem/8/',
+    };
+
+    const MetadataApiEndpoints = {
+        '1': 'http://localhost:8003/problem/create-metadata/solve-vrp/',
+        '2': 'http://localhost:8003/problem/create-metadata/queens/',
+        '3': 'http://localhost:8003/problem/create-metadata/bin_packing/',
+        '4': 'http://localhost:8003/problem/create-metadata/linear_programming/',
+        '5': 'http://localhost:8003/problem/create-metadata/job_shop/',
+        '6': 'http://localhost:8003/problem/create-metadata/multiple_knapsack/',
+        '7': 'http://localhost:8003/problem/create-metadata/max_flow/',
+        '8': 'http://localhost:8003/problem/create-metadata/lin_sum_assignment/',
+    };
+
     const handleModelSelection = (event) => {
         const selectedId = event.target.value;
         const selectedModel = solverModels.find(model => model.modelId === selectedId);
@@ -134,22 +158,28 @@ function NewSubmission() {
         const metadataValues = {};
         let allFieldsFilled = true;
 
+        // Collect metadata values and check if any are empty
         for (let key in metadataRefs.current) {
-            const value = metadataRefs.current[key].value;
-            metadataValues[currentMetadata.find(data => data.id === key).title] = value;
-            if (value === '') {
-                allFieldsFilled = false;
+            if (metadataRefs.current[key]) {
+                const value = metadataRefs.current[key].value;
+                metadataValues[currentMetadata.find(data => data.id === key).title] = value;
+                if (value === '') {
+                    allFieldsFilled = false;
+                }
             }
         }
 
+        // Collect input data values and check if any are empty
         const inputDataValues = {};
         for (let key in inputDataRefs.current) {
-            const value = inputDataRefs.current[key].value;
-            const inputDataField = currentInputData.find(data => data.id === key);
-            if (value === '') {
-                allFieldsFilled = false;
+            if (inputDataRefs.current[key]) {
+                const value = inputDataRefs.current[key].value;
+                const inputDataField = currentInputData.find(data => data.id === key);
+                if (value === '') {
+                    allFieldsFilled = false;
+                }
+                inputDataValues[inputDataField.title] = inputDataField.type === 'file' ? (inputDataRefs.current[key].files[0]?.name || '') : value;
             }
-            inputDataValues[inputDataField.title] = inputDataField.type === 'file' ? (inputDataRefs.current[key].files[0]?.name || '') : value;
         }
 
         setAllFieldsFilled(allFieldsFilled);
@@ -172,6 +202,44 @@ function NewSubmission() {
         setSubmissionData(null);
         setAllFieldsFilled(true); // Reset allFieldsFilled to true
         setErrorMessage(''); // Clear any existing error messages
+    };
+
+    const handleApiCall = async () => {
+        if (!submissionData) {
+            setErrorMessage('Submission data is not prepared');
+            return;
+        }
+
+        // Assume username is part of your state and accessible
+        const apiUrl = MetadataApiEndpoints[selectedModel.modelId];
+        const requestBody = {
+            metadata: {
+                ...submissionData.metadata,
+                username: username  // Insert username into the metadata
+            },
+            inputData: submissionData.inputData // This might be specific to the problem
+        };
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('API call successful:', result);
+                navigate('/success', { state: { result } });
+            } else {
+                const errorData = await response.json();
+                setErrorMessage(`API call failed: ${errorData.message}`);
+            }
+        } catch (error) {
+            setErrorMessage(`API call failed: ${error.message}`);
+        }
     };
 
     function InputComponent({ dataId, dataType, inputRef }) {
@@ -270,6 +338,7 @@ function NewSubmission() {
                 <button className="upload-button" onClick={handleSubmit}>Create Submission Data</button>
                 <div className="form-buttons">
                     <button className="cancel-button" onClick={handleClear}>Clear</button>
+                    <button className="create-button" style={{ backgroundColor: 'green', color: 'white' }} onClick={handleApiCall}>Create</button>
                 </div>
                 {errorMessage && (
                     <div className="error-message">
@@ -288,3 +357,4 @@ function NewSubmission() {
 }
 
 export default NewSubmission;
+
