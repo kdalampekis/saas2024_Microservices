@@ -9,6 +9,8 @@ function MySubmissions() {
     const username = location.state?.username || '24'; // For testing, default to 24 if username is not provided
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
     const [creditBalance, setCreditBalance] = useState(0);
+    const [creditsToAdd, setCreditsToAdd] = useState(0); // State for the input value
+    const [userId, setUserId] = useState(username); // State for the user ID input
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -21,47 +23,80 @@ function MySubmissions() {
         };
     }, []);
 
-    useEffect(() => {
-        const initializeAndFetchCreditBalance = async () => {
-            try {
-                // Initialize user's credit balance
-                const initializeResponse = await fetch(`http://localhost:8002/credits/initialize_user_credits/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ user_id: username }),
-                });
+    const initializeAndFetchCreditBalance = async (id) => {
+        try {
+            // Initialize user's credit balance
+            const initializeResponse = await fetch(`http://localhost:8002/credits/initialize_user_credits/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: id }),
+            });
 
-                if (!initializeResponse.ok && initializeResponse.status !== 400) {
-                    throw new Error(`Failed to initialize credit balance: ${initializeResponse.statusText}`);
-                }
-
-                console.log('Initialization Success');
-
-                // Fetch user's credit balance after initialization
-                const fetchResponse = await fetch(`http://localhost:8002/credits/balance/${username}/`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!fetchResponse.ok) {
-                    throw new Error(`Failed to fetch credit balance: ${fetchResponse.statusText}`);
-                }
-
-                const fetchData = await fetchResponse.json();
-                console.log('Fetch Success:', fetchData);
-                setCreditBalance(fetchData.balance);
-            } catch (error) {
-                console.error('Error:', error);
-                setError(error.message);
+            if (!initializeResponse.ok && initializeResponse.status !== 400) {
+                throw new Error(`Failed to initialize credit balance: ${initializeResponse.statusText}`);
             }
-        };
 
-        initializeAndFetchCreditBalance();
+            console.log('Initialization Success');
+
+            // Fetch user's credit balance after initialization
+            const fetchResponse = await fetch(`http://localhost:8002/credits/balance/${id}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!fetchResponse.ok) {
+                throw new Error(`Failed to fetch credit balance: ${fetchResponse.statusText}`);
+            }
+
+            const fetchData = await fetchResponse.json();
+            console.log('Fetch Success:', fetchData);
+            setCreditBalance(fetchData.balance);
+        } catch (error) {
+            console.error('Error initializing and fetching credit balance:', error);
+            setError(error.message);
+        }
+    };
+
+    useEffect(() => {
+        initializeAndFetchCreditBalance(username);
     }, [username]);
+
+    const handleNewClick = () => {
+        navigate('/NewSubmission', { state: { username: username } }); // Navigate and pass username
+    };
+
+    const handleBuyCredits = async () => {
+        try {
+            if (!userId) {
+                throw new Error('User ID is required');
+            }
+
+            const response = await fetch(`http://localhost:8002/credits/purchase/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: userId, credits: creditsToAdd }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to buy credits: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('Buy Credits Success:', data);
+
+            // Reload the page
+            window.location.reload();
+        } catch (error) {
+            console.error('Error buying credits:', error);
+            setError(error.message);
+        }
+    };
 
     // Example data for the table
     const submissions = [
@@ -69,11 +104,6 @@ function MySubmissions() {
         { name: 'Submission 2', createdOn: 'Date 2', status: 'not ready' },
         // ... other submissions
     ];
-
-    // Add any functionality for when the "New Problem" button is clicked
-    const handleNewClick = () => {
-        navigate('/NewSubmission', { state: { username: username } }); // Navigate and pass username
-    };
 
     return (
         <div className="landing">
@@ -94,6 +124,21 @@ function MySubmissions() {
                 ) : (
                     <p>{creditBalance}</p>
                 )}
+                <div className="buy-credits">
+                    <input
+                        type="text"
+                        value={userId}
+                        onChange={(e) => setUserId(e.target.value)}
+                        placeholder="Enter your user ID"
+                    />
+                    <input
+                        type="number"
+                        value={creditsToAdd}
+                        onChange={(e) => setCreditsToAdd(Number(e.target.value))}
+                        placeholder="Enter credits to buy"
+                    />
+                    <button onClick={handleBuyCredits}>Buy Credits</button>
+                </div>
             </div>
             <div className="submissions-table">
                 <table>
