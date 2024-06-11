@@ -343,11 +343,15 @@ label {
 
 .model-dropdown {
   width: 100%;
-  padding: 10px;
+  padding: 15px; /* Increased padding for a bigger dropdown */
+  margin-top: 20px;
   margin-bottom: 20px; /* Adjust as needed */
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-weight: bold; /* Make the letters bold */
+  font-size: 16px; /* Adjust the font size for bigger text */
 }
+
 
 
 /* Add to your index.css */

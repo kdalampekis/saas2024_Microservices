@@ -5,13 +5,11 @@ import logo2 from '../../src/topLogo.png';
 
 function NewSubmission() {
     const location = useLocation();
-    const username = location.state?.username;
     const navigate = useNavigate();
+    const username = location.state?.username || 'Guest';
 
     const [selectedModel, setSelectedModel] = useState({ id: '', title: '' });
-    const [currentMetadata, setCurrentMetadata] = useState([]);
     const [currentInputData, setCurrentInputData] = useState([]);
-    const [submissionData, setSubmissionData] = useState(null);
     const [errorMessage, setErrorMessage] = useState('');
     const [allFieldsFilled, setAllFieldsFilled] = useState(true);
 
@@ -36,7 +34,7 @@ function NewSubmission() {
     }
 
     const solverModels = [
-        { modelId: '1', title: 'solve-vrp', notes: 'Optimize vehicle routing paths.' },
+        { modelId: '1', title: 'vrp', notes: 'Optimize vehicle routing paths.' },
         { modelId: '2', title: 'queens', notes: 'Solve the n-queens puzzle.' },
         { modelId: '3', title: 'bin_packing', notes: 'Optimize bin packing using weights.' },
         { modelId: '4', title: 'linear_programming', notes: 'Solve linear programming problems.' },
@@ -46,87 +44,69 @@ function NewSubmission() {
         { modelId: '8', title: 'lin_sum_assignment', notes: 'Optimize linear sum assignment.' },
     ];
 
+    const staticMetadata = [
+        { id: 'username', title: 'Username', uom: 'text', type: 'text', value: username },
+        { id: 'credit_cost', title: 'Credit Cost', uom: 'credits', type: 'number', value: '100' }
+    ];
+
     const modelSpecificData = {
         '1': { // Model ID for 'solve-vrp'
-            metadata: [
-                { id: '002', title: 'Vehicle Counts', uom: 'Vehicles', type: 'number' }
-            ],
             inputData: [
-                { id: '102', title: 'Locations File', uom: 'File', type: 'file' },
-                { id: '103', title: 'Number of Vehicles', uom: 'Vehicles', type: 'number' },
-                { id: '104', title: 'Vehicles Capacity', uom: 'Capacity', type: 'number' }
+                { id: 'locations_file', title: 'Locations File', uom: 'File', type: 'file' },
+                { id: 'number_of_locations', title: 'Number of Vehicles', uom: 'Vehicles', type: 'text' },
+                { id: 'number_of_vehicles', title: 'Number of Locations', uom: 'Locations', type: 'text' },
+                { id: 'vehicle_capacity', title: 'Vehicles Capacity', uom: 'Capacity', type: 'text' }
             ]
         },
         '2': { // Model ID for 'queens'
-            metadata: [
-                { id: '001', title: 'Chessboard Size', uom: 'Squares', type: 'number' }
-            ],
             inputData: [
-                { id: '101', title: 'Starting Position', uom: 'Coordinates', type: 'text' } // Assuming text format for simplicity
+                { id: 'board_size', title: 'Chessboard Size', uom: 'Squares', type: 'text' }// Assuming text format for simplicity
             ]
         },
-
         '3': { // Model ID for 'bin_packing'
-            metadata: [],
             inputData: [
-                { id: '105', title: 'Weights', uom: 'Weights list', type: 'text' }, // Comma-separated weights
-                { id: '106', title: 'Bin Capacity', uom: 'Max number', type: 'number' }
+                { id: 'weights', title: 'Weights', uom: 'Weights list', type: 'text' }, // Comma-separated weights
+                { id: 'bin_capacity', title: 'Bin Capacity', uom: 'Max number', type: 'text' }
             ]
         },
         '4': { // Model ID for 'linear_programming'
-            metadata: [],
             inputData: [
-                { id: '107', title: 'Objective Coefficient', uom: 'Tuple', type: 'text' },
-                { id: '108', title: 'Constraints Coefficient', uom: 'Matrix', type: 'text' },
-                { id: '109', title: 'Bounds', uom: 'Tuple', type: 'text' }
+                { id: 'objective_coeffs', title: 'Objective Coefficient', uom: 'Tuple', type: 'text' },
+                { id: 'constraints_coeffs', title: 'Constraints Coefficient', uom: 'Matrix', type: 'text' },
+                { id: 'bounds', title: 'Bounds', uom: 'Tuple', type: 'text' }
             ]
         },
         '5': { // Model ID for 'job_shop'
-            metadata: [],
             inputData: [
-                { id: '110', title: 'Jobs Data', uom: 'Matrix of Tuples', type: 'text' } // Nested tuples represented in textarea
+                { id: 'jobs_data', title: 'Jobs Data', uom: 'Matrix of Tuples', type: 'text' } // Nested tuples represented in textarea
             ]
         },
         '6': { // Model ID for 'multiple_knapsack'
-            metadata: [],
             inputData: [
-                { id: '111', title: 'Weights', uom: 'Matrix', type: 'text' }, // Matrix of weights
-                { id: '112', title: 'Values', uom: 'Matrix', type: 'text' }, // Matrix of values
-                { id: '113', title: 'Bin Capacity', uom: 'Capacity', type: 'number' },
-                { id: '114', title: 'Number of Bins', uom: 'Number', type: 'number' }
+                { id: 'weights', title: 'Weights', uom: 'Matrix', type: 'text' }, // Matrix of weights
+                { id: 'values', title: 'Values', uom: 'Matrix', type: 'text' }, // Matrix of values
+                { id: 'bin_capacity', title: 'Bin Capacity', uom: 'Capacity', type: 'text' },
+                { id: 'num_bins', title: 'Number of Bins', uom: 'Number', type: 'text' }
             ]
         },
         '7': { // Model ID for 'max_flow'
-            metadata: [],
             inputData: [
-                { id: '115', title: 'Start Nodes', uom: 'List', type: 'text' }, // Comma-separated list of start nodes
-                { id: '116', title: 'End Nodes', uom: 'List', type: 'text' }, // Comma-separated list of end nodes
-                { id: '117', title: 'Capacities', uom: 'List', type: 'text' }, // Comma-separated list of capacities
-                { id: '118', title: 'Source', uom: 'Node', type: 'number'},
-                { id: '119', title: 'Sink', uom: 'Node', type: 'number' }
+                { id: 'start_nodes', title: 'Start Nodes', uom: 'List', type: 'text' }, // Comma-separated list of start nodes
+                { id: 'end_nodes', title: 'End Nodes', uom: 'List', type: 'text' }, // Comma-separated list of end nodes
+                { id: 'capacities', title: 'Capacities', uom: 'List', type: 'text' }, // Comma-separated list of capacities
+                { id: 'source', title: 'Source', uom: 'Node', type: 'text' },
+                { id: 'sink', title: 'Sink', uom: 'Node', type: 'text' }
             ]
         },
         '8': { // Model ID for 'lin_sum_assignment'
-            metadata: [],
             inputData: [
-                { id: '120', title: 'Costs', uom: 'Matrix', type: 'textarea' } // Costs matrix
+                { id: 'costs', title: 'Costs', uom: 'Matrix', type: 'textarea' } // Costs matrix
             ]
         }
     };
 
-    const SubmitApiEndpoints = {
-        '1': 'http://localhost:8003/problem/submit_problem/1/',
-        '2': 'http://localhost:8003/problem/submit_problem/2/',
-        '3': 'http://localhost:8003/problem/submit_problem/3/',
-        '4': 'http://localhost:8003/problem/submit_problem/4/',
-        '5': 'http://localhost:8003/problem/submit_problem/5/',
-        '6': 'http://localhost:8003/problem/submit_problem/6/',
-        '7': 'http://localhost:8003/problem/submit_problem/7/',
-        '8': 'http://localhost:8003/problem/submit_problem/8/',
-    };
-
     const MetadataApiEndpoints = {
-        '1': 'http://localhost:8003/problem/create-metadata/solve-vrp/',
+        '1': 'http://localhost:8003/problem/create-metadata/vrp/',
         '2': 'http://localhost:8003/problem/create-metadata/queens/',
         '3': 'http://localhost:8003/problem/create-metadata/bin_packing/',
         '4': 'http://localhost:8003/problem/create-metadata/linear_programming/',
@@ -141,46 +121,41 @@ function NewSubmission() {
         const selectedModel = solverModels.find(model => model.modelId === selectedId);
         setSelectedModel(selectedModel || { id: '', title: '' });
         if (selectedModel) {
-            const modelData = modelSpecificData[selectedId] || { metadata: [], inputData: [] };
-            setCurrentMetadata(modelData.metadata);
+            const modelData = modelSpecificData[selectedId] || { inputData: [] };
             setCurrentInputData(modelData.inputData);
             metadataRefs.current = {};
             inputDataRefs.current = {};
         } else {
-            setCurrentMetadata([]);
             setCurrentInputData([]);
         }
         setAllFieldsFilled(true); // Reset allFieldsFilled to true
         setErrorMessage(''); // Clear any existing error messages
     };
 
-    const handleSubmit = () => {
-        const metadataValues = {};
+    const handleClear = () => {
+        setAllFieldsFilled(true); // Reset allFieldsFilled to true
+        setErrorMessage(''); // Clear any existing error messages
+    };
+
+    const handleApiCall = async () => {
+        const formData = new FormData();
         let allFieldsFilled = true;
 
-        // Collect metadata values and check if any are empty
-        for (let key in metadataRefs.current) {
-            if (metadataRefs.current[key]) {
-                const value = metadataRefs.current[key].value;
-                metadataValues[currentMetadata.find(data => data.id === key).title] = value;
-                if (value === '') {
-                    allFieldsFilled = false;
-                }
-            }
-        }
+        // Collect static metadata values and check if any are empty
+        staticMetadata.forEach(data => {
+            const value = metadataRefs.current[data.id]?.value || data.value;
+            formData.append(data.id, value);
+        });
 
         // Collect input data values and check if any are empty
-        const inputDataValues = {};
-        for (let key in inputDataRefs.current) {
-            if (inputDataRefs.current[key]) {
-                const value = inputDataRefs.current[key].value;
-                const inputDataField = currentInputData.find(data => data.id === key);
-                if (value === '') {
-                    allFieldsFilled = false;
-                }
-                inputDataValues[inputDataField.title] = inputDataField.type === 'file' ? (inputDataRefs.current[key].files[0]?.name || '') : value;
+        currentInputData.forEach(data => {
+            const inputElement = inputDataRefs.current[data.id];
+            const value = data.type === 'file' ? inputElement?.files[0] : inputElement?.value;
+            formData.append(data.id, value);
+            if (value === '' || value === undefined) {
+                allFieldsFilled = false;
             }
-        }
+        });
 
         setAllFieldsFilled(allFieldsFilled);
 
@@ -189,64 +164,33 @@ function NewSubmission() {
             return;
         }
 
-        const problemData = {
-            typeOfProblem: selectedModel.title || 'No model selected',
-            metadata: metadataValues,
-            inputData: inputDataValues
-        };
-        setSubmissionData(problemData);
-        setErrorMessage(''); // Clear error message if form is submitted successfully
-    };
-
-    const handleClear = () => {
-        setSubmissionData(null);
-        setAllFieldsFilled(true); // Reset allFieldsFilled to true
-        setErrorMessage(''); // Clear any existing error messages
-    };
-
-    const handleApiCall = async () => {
-        if (!submissionData) {
-            setErrorMessage('Submission data is not prepared');
-            return;
-        }
-
-        // Assume username is part of your state and accessible
         const apiUrl = MetadataApiEndpoints[selectedModel.modelId];
-        const requestBody = {
-            metadata: {
-                ...submissionData.metadata,
-                username: username  // Insert username into the metadata
-            },
-            inputData: submissionData.inputData // This might be specific to the problem
-        };
 
         try {
             const response = await fetch(apiUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody)
+                body: formData
             });
 
             if (response.ok) {
                 const result = await response.json();
                 console.log('API call successful:', result);
-                navigate('/success', { state: { result } });
             } else {
                 const errorData = await response.json();
-                setErrorMessage(`API call failed: ${errorData.message}`);
+                setErrorMessage(`API else failed: ${errorData.message}`);
             }
         } catch (error) {
-            setErrorMessage(`API call failed: ${error.message}`);
+            setErrorMessage(`API try call failed: ${error.message}`);
+            console.log(formData);
         }
     };
 
-    function InputComponent({ dataId, dataType, inputRef }) {
+    function InputComponent({ dataId, dataType, inputRef, defaultValue }) {
         return (
             <input
                 type={dataType}
                 ref={inputRef}
+                defaultValue={defaultValue}
                 className={dataType === 'file' ? 'file-input' : 'text-input'}
             />
         );
@@ -285,18 +229,12 @@ function NewSubmission() {
                         </tr>
                         </thead>
                         <tbody>
-                        {currentMetadata.map(data => (
+                        {staticMetadata.map(data => (
                             <tr key={data.id}>
                                 <td>{data.id}</td>
                                 <td>{data.title}</td>
                                 <td>{data.uom}</td>
-                                <td>
-                                    <InputComponent
-                                        dataId={data.id}
-                                        dataType={data.type || 'text'}
-                                        inputRef={el => metadataRefs.current[data.id] = el}
-                                    />
-                                </td>
+                                <td>{data.value}</td>
                             </tr>
                         ))}
                         </tbody>
@@ -322,7 +260,7 @@ function NewSubmission() {
                                 <td>
                                     <InputComponent
                                         dataId={data.id}
-                                        dataType={data.type || 'text'}
+                                        dataType={data.type}
                                         inputRef={el => inputDataRefs.current[data.id] = el}
                                     />
                                 </td>
@@ -335,7 +273,6 @@ function NewSubmission() {
 
             <div className="submission-section">
                 <h3>New problem submission for {selectedModel.title || '<model not selected>'}</h3>
-                <button className="upload-button" onClick={handleSubmit}>Create Submission Data</button>
                 <div className="form-buttons">
                     <button className="cancel-button" onClick={handleClear}>Clear</button>
                     <button className="create-button" style={{ backgroundColor: 'green', color: 'white' }} onClick={handleApiCall}>Create</button>
@@ -345,16 +282,9 @@ function NewSubmission() {
                         <p>{errorMessage}</p>
                     </div>
                 )}
-                {submissionData && (
-                    <div className="submission-data">
-                        <h4>Submission Data:</h4>
-                        <pre>{JSON.stringify(submissionData, null, 2)}</pre>
-                    </div>
-                )}
             </div>
         </div>
     );
 }
 
 export default NewSubmission;
-
