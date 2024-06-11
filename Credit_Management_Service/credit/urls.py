@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from creditService.views import GetBalanceView, PurchaseCreditsView, SpendCreditsView, InitializeUserCreditBalanceView
+from creditService.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -8,6 +8,7 @@ urlpatterns = [
     path('credits/purchase/', PurchaseCreditsView.as_view(), name='purchase-credits'),
     path('credits/<str:user_id>/spend/', SpendCreditsView.as_view(), name='update-credits'),
     path('credits/initialize_user_credits/', InitializeUserCreditBalanceView.as_view(), name='initialize_user_credits'),
+    path('users/get_id_by_username/<str:username>/', get_user_id_by_username, name='get_user_id_by_username'),
 ]
 
 """

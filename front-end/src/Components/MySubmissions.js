@@ -10,7 +10,7 @@ function MySubmissions() {
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
     const [creditBalance, setCreditBalance] = useState(0);
     const [creditsToAdd, setCreditsToAdd] = useState(0);
-    const [userId, setUserId] = useState(username);
+    const [userId, setUserId] = useState(null); // Initialize userId as null
     const [error, setError] = useState(null);
     const [submissions, setSubmissions] = useState([]);
 
@@ -24,35 +24,43 @@ function MySubmissions() {
         };
     }, []);
 
-    const initializeAndFetchCreditBalance = async (id) => {
+    const fetchUserId = async (username) => {
         try {
-            const initializeResponse = await fetch(`http://localhost:8002/credits/initialize_user_credits/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ user_id: id }),
-            });
-
-            if (!initializeResponse.ok && initializeResponse.status !== 400) {
-                throw new Error(`Failed to initialize credit balance: ${initializeResponse.statusText}`);
-            }
-
-            const fetchResponse = await fetch(`http://localhost:8002/credits/balance/${id}/`, {
+            const response = await fetch(`http://localhost:8002/users/get_id_by_username/${username}/`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
 
-            if (!fetchResponse.ok) {
-                throw new Error(`Failed to fetch credit balance: ${fetchResponse.statusText}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch user ID: ${response.statusText}`);
             }
 
-            const fetchData = await fetchResponse.json();
-            setCreditBalance(fetchData.balance);
+            const data = await response.json();
+            setUserId(data.user_id); // Assuming the response contains the user ID in this format
         } catch (error) {
-            setError(error.message);
+            setError(`Error fetching user ID: ${error.message}`);
+        }
+    };
+
+    const fetchCreditBalance = async (username) => {
+        try {
+            const response = await fetch(`http://localhost:8002/credits/balance/${username}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch credit balance: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            setCreditBalance(data.balance);
+        } catch (error) {
+            setError(`Error fetching credit balance: ${error.message}`);
         }
     };
 
@@ -82,7 +90,8 @@ function MySubmissions() {
 
     useEffect(() => {
         if (username) {
-            initializeAndFetchCreditBalance(username);
+            fetchUserId(username);
+            fetchCreditBalance(username);
             fetchUserSubmissions(username);
         } else {
             console.error('Username is not defined');
@@ -112,7 +121,7 @@ function MySubmissions() {
     };
 
     const runSubmission = async (submissionId) => {
-        try{
+        try {
             const response = await fetch(`http://localhost:8003/problem/submit_problem/${submissionId}/`, {
                 method: 'POST'
             });
@@ -120,11 +129,10 @@ function MySubmissions() {
             if (!response.ok) {
                 throw new Error(`Failed to execute submission: ${response.statusText}`);
             }
-
-        }catch(error) {
+        } catch (error) {
             setError(`Error submitting submission: ${error.message}`);
         }
-    }
+    };
 
     const handleBuyCredits = async () => {
         try {
@@ -183,12 +191,6 @@ function MySubmissions() {
                 )}
                 <div className="buy-credits">
                     <input
-                        type="text"
-                        value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
-                        placeholder="Enter your user ID"
-                    />
-                    <input
                         type="number"
                         value={creditsToAdd}
                         onChange={(e) => setCreditsToAdd(Number(e.target.value))}
@@ -217,14 +219,14 @@ function MySubmissions() {
                                 <button>View/Edit</button>
                             </td>
                             <td>
-                            <button
+                                <button
                                     onClick={() => {
                                         if (window.confirm("Are you sure you want to run this submission?")) {
                                             runSubmission(submission.submission_id);
                                         }
                                     }}>
-                                Run
-                            </button>
+                                    Run
+                                </button>
                             </td>
                             <td>
                                 <button>View Results</button>
