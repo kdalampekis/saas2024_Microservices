@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function MySubmissions() {
     const location = useLocation();
     const navigate = useNavigate();
-    const username = location.state?.username || 'default_username';
+    const username = location.state?.username || 'Guest';
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
     const [creditBalance, setCreditBalance] = useState(0);
     const [creditsToAdd, setCreditsToAdd] = useState(0);
@@ -92,6 +92,39 @@ function MySubmissions() {
     const handleNewClick = () => {
         navigate('/NewSubmission', { state: { username: username } });
     };
+
+    const deleteSubmission = async (submissionId) => {
+        try {
+            const response = await fetch(`http://localhost:8001/metadata/delete/${submissionId}/`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to delete submission: ${response.statusText}`);
+            }
+
+            // Remove the deleted submission from the state
+            const updatedSubmissions = submissions.filter(submission => submission.submission_id !== submissionId);
+            setSubmissions(updatedSubmissions);
+        } catch (error) {
+            setError(`Error deleting submission: ${error.message}`);
+        }
+    };
+
+    const runSubmission = async (submissionId) => {
+        try{
+            const response = await fetch(`http://localhost:8003/problem/submit_problem/${submissionId}/`, {
+                method: 'POST'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to execute submission: ${response.statusText}`);
+            }
+
+        }catch(error) {
+            setError(`Error submitting submission: ${error.message}`);
+        }
+    }
 
     const handleBuyCredits = async () => {
         try {
@@ -184,13 +217,27 @@ function MySubmissions() {
                                 <button>View/Edit</button>
                             </td>
                             <td>
-                                <button>Run</button>
+                            <button
+                                    onClick={() => {
+                                        if (window.confirm("Are you sure you want to run this submission?")) {
+                                            runSubmission(submission.submission_id);
+                                        }
+                                    }}>
+                                Run
+                            </button>
                             </td>
                             <td>
                                 <button>View Results</button>
                             </td>
                             <td>
-                                <button className="delete-button">Delete</button>
+                                <button className="delete-button"
+                                        onClick={() => {
+                                            if (window.confirm("Are you sure you want to delete this submission?")) {
+                                                deleteSubmission(submission.submission_id);
+                                            }
+                                        }}>
+                                    Delete
+                                </button>
                             </td>
                         </tr>
                     ))}

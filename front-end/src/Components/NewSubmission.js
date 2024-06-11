@@ -175,6 +175,7 @@ function NewSubmission() {
             if (response.ok) {
                 const result = await response.json();
                 console.log('API call successful:', result);
+                navigate('/MySubmissions', { state: { username: username } });
             } else {
                 const errorData = await response.json();
                 setErrorMessage(`API else failed: ${errorData.message}`);
