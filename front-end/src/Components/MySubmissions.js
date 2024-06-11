@@ -6,12 +6,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function MySubmissions() {
     const location = useLocation();
     const navigate = useNavigate();
-    const username = location.state?.username || '24'; // For testing, default to 24 if username is not provided
+    const username = location.state?.username || 'default_username';
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
     const [creditBalance, setCreditBalance] = useState(0);
-    const [creditsToAdd, setCreditsToAdd] = useState(0); // State for the input value
-    const [userId, setUserId] = useState(username); // State for the user ID input
+    const [creditsToAdd, setCreditsToAdd] = useState(0);
+    const [userId, setUserId] = useState(username);
     const [error, setError] = useState(null);
+    const [submissions, setSubmissions] = useState([]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -25,7 +26,6 @@ function MySubmissions() {
 
     const initializeAndFetchCreditBalance = async (id) => {
         try {
-            // Initialize user's credit balance
             const initializeResponse = await fetch(`http://localhost:8002/credits/initialize_user_credits/`, {
                 method: 'POST',
                 headers: {
@@ -38,9 +38,6 @@ function MySubmissions() {
                 throw new Error(`Failed to initialize credit balance: ${initializeResponse.statusText}`);
             }
 
-            console.log('Initialization Success');
-
-            // Fetch user's credit balance after initialization
             const fetchResponse = await fetch(`http://localhost:8002/credits/balance/${id}/`, {
                 method: 'GET',
                 headers: {
@@ -53,20 +50,47 @@ function MySubmissions() {
             }
 
             const fetchData = await fetchResponse.json();
-            console.log('Fetch Success:', fetchData);
             setCreditBalance(fetchData.balance);
         } catch (error) {
-            console.error('Error initializing and fetching credit balance:', error);
             setError(error.message);
         }
     };
 
+    const fetchUserSubmissions = async (username) => {
+        if (!username) {
+            console.error('Username is not defined');
+            return;
+        }
+        try {
+            const response = await fetch(`http://localhost:8003/problem/submissions/${username}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch submissions: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            setSubmissions(data);
+        } catch (error) {
+            setError(`Error fetching submissions: ${error.message}`);
+        }
+    };
+
     useEffect(() => {
-        initializeAndFetchCreditBalance(username);
+        if (username) {
+            initializeAndFetchCreditBalance(username);
+            fetchUserSubmissions(username);
+        } else {
+            console.error('Username is not defined');
+        }
     }, [username]);
 
     const handleNewClick = () => {
-        navigate('/NewSubmission', { state: { username: username } }); // Navigate and pass username
+        navigate('/NewSubmission', { state: { username: username } });
     };
 
     const handleBuyCredits = async () => {
@@ -88,22 +112,22 @@ function MySubmissions() {
             }
 
             const data = await response.json();
-            console.log('Buy Credits Success:', data);
 
-            // Reload the page
             window.location.reload();
         } catch (error) {
-            console.error('Error buying credits:', error);
             setError(error.message);
         }
     };
 
-    // Example data for the table
-    const submissions = [
-        { name: 'Submission 1', createdOn: 'Date 1', status: 'ready' },
-        { name: 'Submission 2', createdOn: 'Date 2', status: 'not ready' },
-        // ... other submissions
-    ];
+    const getStatusText = (submission) => {
+        if (submission.status === 'Executed') {
+            return 'Executed';
+        } else if (submission.status === 'Ready') {
+            return 'Ready';
+        } else {
+            return 'Not Ready';
+        }
+    };
 
     return (
         <div className="landing">
@@ -153,9 +177,9 @@ function MySubmissions() {
                     <tbody>
                     {submissions.map((submission, index) => (
                         <tr key={index}>
-                            <td>{submission.name}</td>
-                            <td>{submission.createdOn}</td>
-                            <td>{submission.status}</td>
+                            <td>{submission.submission_id}</td>
+                            <td>{new Date(submission.date).toLocaleString()}</td>
+                            <td>{getStatusText(submission)}</td>
                             <td>
                                 <button>View/Edit</button>
                             </td>
