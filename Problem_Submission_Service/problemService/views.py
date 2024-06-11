@@ -23,8 +23,14 @@ def user_submissions(request, username):
     return JsonResponse(submissions, safe=False)
 
 class UserSubmissionsView(APIView):
-    def get(self, request, username, *args, **kwargs):
-        submissions = Metadata.objects.filter(username=username)
+    def get(self, request, username=None, *args, **kwargs):
+        if username:
+            logger.debug(f'Fetching submissions for user: {username}')
+            submissions = Metadata.objects.filter(username=username)
+        else:
+            logger.debug('Fetching all submissions')
+            submissions = Metadata.objects.all()
+
         serializer = MetadataSerializer(submissions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
