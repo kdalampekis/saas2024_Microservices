@@ -140,54 +140,71 @@ function NewSubmission() {
 
 
 
-        const handleApiCall = async () => {
-            const formData = new FormData();
-            let allFieldsFilled = true;
+    const handleApiCall = async () => {
+        const formData = new FormData();
+        let allFieldsFilled = true;
 
-            // Collect static metadata values and check if any are empty
-            staticMetadata.forEach(data => {
-                const value = metadataRefs.current[data.id]?.value || data.value;
-                formData.append(data.id, value);
-            });
+        // Collect static metadata values and check if any are empty
+        staticMetadata.forEach(data => {
+            const value = metadataRefs.current[data.id]?.value || data.value;
+            formData.append(data.id, value);
+        });
 
-            // Collect input data values and check if any are empty
-            currentInputData.forEach(data => {
-                const inputElement = inputDataRefs.current[data.id];
-                const value = data.type === 'file' ? inputElement?.files[0] : inputElement?.value;
-                formData.append(data.id, value);
-                if (value === '' || value === undefined) {
-                    allFieldsFilled = false;
-                }
-            });
-
-            setAllFieldsFilled(allFieldsFilled);
-
-            if (!allFieldsFilled) {
-                setErrorMessage('All the inputs must be filled');
-                return;
+        // Collect input data values and check if any are empty
+        currentInputData.forEach(data => {
+            const inputElement = inputDataRefs.current[data.id];
+            const value = data.type === 'file' ? inputElement?.files[0] : inputElement?.value;
+            formData.append(data.id, value);
+            if (value === '' || value === undefined) {
+                allFieldsFilled = false;
             }
+        });
 
-            const apiUrl = MetadataApiEndpoints[selectedModel.modelId];
+        setAllFieldsFilled(allFieldsFilled);
 
-            try {
-                const response = await fetch(apiUrl, {
+        if (!allFieldsFilled) {
+            setErrorMessage('All the inputs must be filled');
+            return;
+        }
+
+        const apiUrl = MetadataApiEndpoints[selectedModel.modelId];
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('API call successful:', result);
+
+                // Call SpendCreditsView to deduct credits
+                const spendCreditsResponse = await fetch(`http://localhost:8002/credits/${username}/spend/`, {
                     method: 'POST',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ credits: selectedModel.cost }),
                 });
 
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('API call successful:', result);
+                if (spendCreditsResponse.ok) {
+                    const spendCreditsResult = await spendCreditsResponse.json();
+                    console.log('Credits deducted successfully:', spendCreditsResult);
                     navigate('/MySubmissions', { state: { username: username } });
                 } else {
-                    const errorData = await response.json();
-                    setErrorMessage(`API else failed: ${errorData.message}`);
+                    const errorData = await spendCreditsResponse.json();
+                    setErrorMessage(`Failed to deduct credits: ${errorData.error}`);
                 }
-            } catch (error) {
-                setErrorMessage(`API try call failed: ${error.message}`);
-                console.log(formData);
+            } else {
+                const errorData = await response.json();
+                setErrorMessage(`API call failed: ${errorData.message}`);
             }
-        };
+        } catch (error) {
+            setErrorMessage(`API call failed: ${error.message}`);
+            console.log(formData);
+        }
+    };
 
         function InputComponent({ dataId, dataType, inputRef, defaultValue }) {
             return (
