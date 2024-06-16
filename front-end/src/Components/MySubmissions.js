@@ -6,10 +6,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function MySubmissions() {
     const location = useLocation();
     const navigate = useNavigate();
-    const username = location.state?.username || '24'; // For testing, default to 24 if username is not provided
+    const username = location.state?.username || 'Guest';
     const [currentDateTime, setCurrentDateTime] = useState(new Date());
     const [creditBalance, setCreditBalance] = useState(0);
+    const [creditsToAdd, setCreditsToAdd] = useState(0);
+    const [userId, setUserId] = useState(null); // Initialize userId as null
     const [error, setError] = useState(null);
+    const [submissions, setSubmissions] = useState([]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -21,58 +24,150 @@ function MySubmissions() {
         };
     }, []);
 
-    useEffect(() => {
-        const initializeAndFetchCreditBalance = async () => {
-            try {
-                // Initialize user's credit balance
-                const initializeResponse = await fetch(`http://localhost:8002/credits/initialize_user_credits/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ user_id: username }),
-                });
+    const fetchUserId = async (username) => {
+        try {
+            const response = await fetch(`http://localhost:8002/users/get_id_by_username/${username}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-                if (!initializeResponse.ok && initializeResponse.status !== 400) {
-                    throw new Error(`Failed to initialize credit balance: ${initializeResponse.statusText}`);
-                }
-
-                console.log('Initialization Success');
-
-                // Fetch user's credit balance after initialization
-                const fetchResponse = await fetch(`http://localhost:8002/credits/balance/${username}/`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-                if (!fetchResponse.ok) {
-                    throw new Error(`Failed to fetch credit balance: ${fetchResponse.statusText}`);
-                }
-
-                const fetchData = await fetchResponse.json();
-                console.log('Fetch Success:', fetchData);
-                setCreditBalance(fetchData.balance);
-            } catch (error) {
-                console.error('Error:', error);
-                setError(error.message);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch user ID: ${response.statusText}`);
             }
-        };
 
-        initializeAndFetchCreditBalance();
+            const data = await response.json();
+            setUserId(data.user_id); // Assuming the response contains the user ID in this format
+        } catch (error) {
+            setError(`Error fetching user ID: ${error.message}`);
+        }
+    };
+
+    const fetchCreditBalance = async (username) => {
+        try {
+            const response = await fetch(`http://localhost:8002/credits/balance/${username}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch credit balance: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            setCreditBalance(data.balance);
+        } catch (error) {
+            setError(`Error fetching credit balance: ${error.message}`);
+        }
+    };
+
+    const fetchUserSubmissions = async (username) => {
+        if (!username) {
+            console.error('Username is not defined');
+            return;
+        }
+        try {
+            const response = await fetch(`http://localhost:8003/problem/submissions/${username}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch submissions: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            setSubmissions(data);
+        } catch (error) {
+            setError(`Error fetching submissions: ${error.message}`);
+        }
+    };
+
+    useEffect(() => {
+        if (username) {
+            fetchUserId(username);
+            fetchCreditBalance(username);
+            fetchUserSubmissions(username);
+        } else {
+            console.error('Username is not defined');
+        }
     }, [username]);
 
-    // Example data for the table
-    const submissions = [
-        { name: 'Submission 1', createdOn: 'Date 1', status: 'ready' },
-        { name: 'Submission 2', createdOn: 'Date 2', status: 'not ready' },
-        // ... other submissions
-    ];
-
-    // Add any functionality for when the "New Problem" button is clicked
     const handleNewClick = () => {
-        navigate('/NewSubmission', { state: { username: username } }); // Navigate and pass username
+        navigate('/NewSubmission', { state: { username: username } });
+    };
+
+    const deleteSubmission = async (submissionId) => {
+        try {
+            const response = await fetch(`http://localhost:8001/metadata/delete/${submissionId}/`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to delete submission: ${response.statusText}`);
+            }
+
+            // Remove the deleted submission from the state
+            const updatedSubmissions = submissions.filter(submission => submission.submission_id !== submissionId);
+            setSubmissions(updatedSubmissions);
+        } catch (error) {
+            setError(`Error deleting submission: ${error.message}`);
+        }
+    };
+
+    const runSubmission = async (submissionId) => {
+        try {
+            const response = await fetch(`http://localhost:8003/problem/submit_problem/${submissionId}/`, {
+                method: 'POST'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to execute submission: ${response.statusText}`);
+            }
+        } catch (error) {
+            setError(`Error submitting submission: ${error.message}`);
+        }
+    };
+
+    const handleBuyCredits = async () => {
+        try {
+            if (!userId) {
+                throw new Error('User ID is required');
+            }
+
+            const response = await fetch(`http://localhost:8002/credits/purchase/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: userId, credits: creditsToAdd }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to buy credits: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+
+            window.location.reload();
+        } catch (error) {
+            setError(error.message);
+        }
+    };
+
+    const getStatusText = (submission) => {
+        if (submission.status === 'Executed') {
+            return 'Executed';
+        } else if (submission.status === 'Ready') {
+            return 'Ready';
+        } else {
+            return 'Not Ready';
+        }
     };
 
     return (
@@ -94,6 +189,15 @@ function MySubmissions() {
                 ) : (
                     <p>{creditBalance}</p>
                 )}
+                <div className="buy-credits">
+                    <input
+                        type="number"
+                        value={creditsToAdd}
+                        onChange={(e) => setCreditsToAdd(Number(e.target.value))}
+                        placeholder="Enter credits to buy"
+                    />
+                    <button onClick={handleBuyCredits}>Buy Credits</button>
+                </div>
             </div>
             <div className="submissions-table">
                 <table>
@@ -108,20 +212,34 @@ function MySubmissions() {
                     <tbody>
                     {submissions.map((submission, index) => (
                         <tr key={index}>
-                            <td>{submission.name}</td>
-                            <td>{submission.createdOn}</td>
-                            <td>{submission.status}</td>
+                            <td>{submission.submission_id}</td>
+                            <td>{new Date(submission.date).toLocaleString()}</td>
+                            <td>{getStatusText(submission)}</td>
                             <td>
                                 <button>View/Edit</button>
                             </td>
                             <td>
-                                <button>Run</button>
+                                <button
+                                    onClick={() => {
+                                        if (window.confirm("Are you sure you want to run this submission?")) {
+                                            runSubmission(submission.submission_id);
+                                        }
+                                    }}>
+                                    Run
+                                </button>
                             </td>
                             <td>
                                 <button>View Results</button>
                             </td>
                             <td>
-                                <button className="delete-button">Delete</button>
+                                <button className="delete-button"
+                                        onClick={() => {
+                                            if (window.confirm("Are you sure you want to delete this submission?")) {
+                                                deleteSubmission(submission.submission_id);
+                                            }
+                                        }}>
+                                    Delete
+                                </button>
                             </td>
                         </tr>
                     ))}

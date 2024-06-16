@@ -5,3 +5,4 @@ typing-extensions==4.11.0
 djangorestframework
 psycopg2-binary
 requests>=2.25.1
+django-cors-headers

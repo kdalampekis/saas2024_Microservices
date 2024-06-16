@@ -9,7 +9,11 @@ import decimal
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth import get_user_model
+from django.http import JsonResponse
 
+def get_user_id_by_username(request, username):
+    user = get_object_or_404(User, username=username)
+    return JsonResponse({'user_id': user.id})
 
 class GetBalanceView(APIView):
     # permission_classes = [IsAuthenticated]

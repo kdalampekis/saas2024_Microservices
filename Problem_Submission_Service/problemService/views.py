@@ -12,8 +12,27 @@ from .serializers import *
 import requests
 import logging
 
+from .models import Metadata
+from .serializers import MetadataSerializer
+
 logger = logging.getLogger(__name__)
 
+def user_submissions(request, username):
+    # Logic to fetch user submissions
+    submissions = get_submissions_for_user(username)
+    return JsonResponse(submissions, safe=False)
+
+class UserSubmissionsView(APIView):
+    def get(self, request, username=None, *args, **kwargs):
+        if username:
+            logger.debug(f'Fetching submissions for user: {username}')
+            submissions = Metadata.objects.filter(username=username)
+        else:
+            logger.debug('Fetching all submissions')
+            submissions = Metadata.objects.all()
+
+        serializer = MetadataSerializer(submissions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MetadataCreateView(APIView):
@@ -165,7 +184,7 @@ def submit_problem(request, sub_id):
         return Response({"error": "Input not found"}, status=404)
 
 
-
+@csrf_exempt
 def initialize_models(request):
     if request.method == 'GET':
         solver_models = [
@@ -188,7 +207,7 @@ def initialize_models(request):
                 print(f'Model {title} already exists, skipping.')
         
         return JsonResponse({"success": 200}, status=200)
-
+    return JsonResponse({"error": "Invalid request method"}, status=400)
 
 
 @csrf_exempt

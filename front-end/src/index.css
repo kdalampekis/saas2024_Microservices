@@ -343,11 +343,15 @@ label {
 
 .model-dropdown {
   width: 100%;
-  padding: 10px;
+  padding: 15px; /* Increased padding for a bigger dropdown */
+  margin-top: 20px;
   margin-bottom: 20px; /* Adjust as needed */
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-weight: bold; /* Make the letters bold */
+  font-size: 16px; /* Adjust the font size for bigger text */
 }
+
 
 
 /* Add to your index.css */
@@ -492,6 +496,38 @@ label {
 .cancel-button {
   background-color: #f44336;
   color: white;
+}
+
+.buy-credits {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.buy-credits input {
+  margin: 5px 0;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 80%;
+  max-width: 300px;
+}
+
+.buy-credits button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.buy-credits button:hover {
+  background-color: #0056b3;
 }
 
 

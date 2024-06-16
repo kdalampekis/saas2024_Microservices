@@ -10,7 +10,9 @@ urlpatterns = [
     path('submission/<int:sub_id>/', submission_detail, name='submission_detail'),
     
     path('vehicle_problem_submission/', vehicle),   # test html page for vrp
-    path('job_shop_submission', job_shop)   # test html page job_shop
+    path('job_shop_submission', job_shop),   # test html page job_shop
+    path('submissions/<str:username>/', UserSubmissionsView.as_view(), name='user_submissions'),
+    path('submissions/', UserSubmissionsView.as_view(), name='all_submissions'),
 ]
 
 

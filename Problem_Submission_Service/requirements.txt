@@ -6,3 +6,4 @@ djangorestframework
 psycopg2-binary
 ortools>=9.0
 requests
+django-cors-headers
