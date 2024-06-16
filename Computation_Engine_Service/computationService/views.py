@@ -407,17 +407,22 @@ def lin_sum_assignment_api(request):
 
 
 
-# Sends all problem results from a specific category (or all of them, if no category is specified)
 @api_view(['GET'])
-def sent_data(request):
-    # Get the 'name' parameter from the query parameters
-    name = request.query_params.get('name', None)
-    if name:
-        print(name)
-        incomes = Results.objects.filter(problem_name=name).values()
-    else:
-        incomes = Results.objects.all().values()
-    return Response(incomes)
+def result_detail(request, sub_id):
+    # Fetch the Results object
+    result = get_object_or_404(Results, submission_id=sub_id)
+    
+    # Prepare the response data
+    response_data = {
+        'submission_id': result.submission_id,
+        'problem_name': result.problem_name,
+        'response_data': result.response_data,
+        'time_taken': result.time_taken,
+        'timestamp': result.timestamp.isoformat(),
+    }
+    
+    # Return JSON response
+    return JsonResponse(response_data)
 
 
 # Deletes the results of a problem (should not be called by itself, only through /metadata/delete)

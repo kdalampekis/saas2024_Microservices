@@ -15,7 +15,7 @@ urlpatterns = [
     # Add more paths for other problems
 
     # other api
-    path('sent_data/', sent_data, name='sent_data'),
+    path('result/<int:sub_id>/', result_detail, name='result_detail'),
     path('delete_result/<int:sub_id>/', delete_result_view, name='delete_result_view'),
     # path('problem_submission/', computation_view, name='computation_view'),
 ]

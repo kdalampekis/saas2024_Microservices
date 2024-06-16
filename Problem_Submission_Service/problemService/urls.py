@@ -7,6 +7,7 @@ urlpatterns = [
     path('create-metadata/<str:solver_name>/', MetadataCreateView.as_view()),    # inserts a new metadata and input instance into the database
     path('submit_problem/<int:sub_id>/', submit_problem),    # sends the submission <int:id> for computing
     path('change_status/<int:sub_id>/', change_status),     # changes a metadata status to 'executed'
+    path('submission/<int:sub_id>/', submission_detail, name='submission_detail'),
     
     path('vehicle_problem_submission/', vehicle),   # test html page for vrp
     path('job_shop_submission', job_shop)   # test html page job_shop

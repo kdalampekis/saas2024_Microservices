@@ -209,6 +209,51 @@ def change_status(request, sub_id):
 
 
 
+def status(ready, executed):
+    if ready:
+        return 'Ready'
+    elif executed:
+        return 'Executed'
+    else:
+        return 'Not Executed'
+
+
+@api_view(['GET'])
+def submission_detail(request, sub_id):
+    # Fetch the metadata object
+    metadata = get_object_or_404(Metadata, pk=sub_id)
+    
+    # Fetch the related inputs
+    input = get_object_or_404(Input, pk=sub_id)
+    
+    # Prepare inputs data
+    inputs_data = {
+        'input_file': input.input_file.url if input.input_file else None,
+        'input_data': input.input_data
+    }
+    
+    # Prepare the response data
+    response_data = {
+        'model': {
+            'model_id': metadata.model_id.model_id,
+            'title': metadata.model_id.title,
+            'name': metadata.model_id.name,
+            'notes': metadata.model_id.notes,
+        },
+        'metadata': {
+            'submission_id': metadata.submission_id,
+            'username': metadata.username,
+            'date': metadata.date.isoformat(),
+            'credit_cost': str(metadata.credit_cost),
+            'status': status(metadata.is_ready, metadata.is_executed),
+        },
+        'inputs': inputs_data,
+    }
+    
+    # Return JSON response
+    return JsonResponse(response_data)
+
+
 def vehicle(request):
     return render(request, 'vehicle_solver.html')
 
