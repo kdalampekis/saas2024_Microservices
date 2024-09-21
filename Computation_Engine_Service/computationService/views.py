@@ -415,7 +415,6 @@ def result_detail(request, sub_id):
     # Prepare the response data
     response_data = {
         'submission_id': result.submission_id,
-        'problem_name': result.problem_name,
         'response_data': result.response_data,
         'time_taken': result.time_taken,
         'timestamp': result.timestamp.isoformat(),

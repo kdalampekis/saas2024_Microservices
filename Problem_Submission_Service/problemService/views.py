@@ -228,7 +228,7 @@ def change_status(request, sub_id):
 
 
 
-def status(ready, executed):
+def state(ready, executed):
     if ready:
         return 'Ready'
     elif executed:
@@ -264,7 +264,7 @@ def submission_detail(request, sub_id):
             'username': metadata.username,
             'date': metadata.date.isoformat(),
             'credit_cost': str(metadata.credit_cost),
-            'status': status(metadata.is_ready, metadata.is_executed),
+            'status': state(metadata.is_ready, metadata.is_executed),
         },
         'inputs': inputs_data,
     }
