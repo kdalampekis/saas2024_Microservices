@@ -10,6 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+from django.db import IntegrityError
+from django.contrib.auth.models import User
 
 def get_user_id_by_username(request, username):
     user = get_object_or_404(User, username=username)
@@ -30,7 +32,7 @@ class GetBalanceView(APIView):
 
 
 User = get_user_model()
-
+'''
 @method_decorator(csrf_exempt, name='dispatch')
 class InitializeUserCreditBalanceView(APIView):
 
@@ -61,8 +63,43 @@ class InitializeUserCreditBalanceView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         serializer = UserCreditBalanceSerializer(user_credit_balance)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED) '''
 
+@method_decorator(csrf_exempt, name='dispatch')
+class InitializeUserCreditBalanceView(APIView):
+
+    def post(self, request):
+        # Use 'username' for clarity instead of 'user_id'
+        username = request.data.get('username')
+        print(f"Username: {username}")
+
+        # Validate if username is provided
+        if not username:
+            return Response({"detail": "Username is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the user exists in the User table
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            # If the user doesn't exist, create a new user
+            user = User(username=username)
+            user.set_password(User.objects.make_random_password())  # Set a random password for the new user
+            user.save()
+
+        # Create or get the UserCreditBalance entry for the user
+        user_credit_balance, created = UserCreditBalance.objects.get_or_create(
+            user=user,
+            defaults={'balance': 0.00}  # Initialize credit balance to 0
+        )
+
+        if not created:
+            print("User credit balance already exists")
+            serializer = UserCreditBalanceSerializer(user_credit_balance)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # If the balance was newly created, return it with a status of 201 Created
+        serializer = UserCreditBalanceSerializer(user_credit_balance)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class PurchaseCreditsView(APIView):
     # permission_classes = [IsAuthenticated]
