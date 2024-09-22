@@ -7,6 +7,7 @@ from rest_framework import status, generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 import requests
+from django.views.decorators.csrf import csrf_exempt
 
 
 
@@ -82,25 +83,30 @@ class SignUpApiView(APIView):
 
 
 class LogoutApiView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @csrf_exempt  # Exempt from CSRF protection for API endpoints
     def post(self, request, *args, **kwargs):
         # Get the token from the request header
         token_header = self.request.META.get('HTTP_AUTHORIZATION')
-        if token_header:
+
+        if token_header and token_header.startswith('Token '):
+            # Extract the actual token after the "Token " prefix
+            token_key = token_header.split(" ")[1]
+
             # Find the user associated with the token
             try:
-                user = Token.objects.get(key=token_header).user
+                user = Token.objects.get(key=token_key).user
             except Token.DoesNotExist:
                 return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
             # Delete the token
             Token.objects.filter(user=user).delete()
 
-            return Response({"detail": "Successfully logged out and deleted auth token."},status=status.HTTP_200_OK)
+            return Response({"detail": "Successfully logged out and deleted auth token."}, status=status.HTTP_200_OK)
         else:
             return Response({"detail": "Invalid token format."}, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, *args, **kwargs):
-        return render(request, "logout.html")
 
 
 

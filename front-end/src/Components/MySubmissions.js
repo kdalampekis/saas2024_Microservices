@@ -25,6 +25,8 @@ function MySubmissions() {
     }, []);
 
     const fetchUserId = async (username) => {
+        console.log(`fetchUserId called for username: ${username}`);  // Log to ensure the function is called
+
         try {
             const response = await fetch(`http://localhost:8002/users/get_id_by_username/${username}/`, {
                 method: 'GET',
@@ -33,16 +35,55 @@ function MySubmissions() {
                 },
             });
 
+            if (response.status === 404) {
+                console.log(`User ${username} not found. Creating new user.`);
+                await createUser(username);  // Call the function to create a new user
+                return;
+            }
+
             if (!response.ok) {
                 throw new Error(`Failed to fetch user ID: ${response.statusText}`);
             }
 
             const data = await response.json();
-            setUserId(data.user_id); // Assuming the response contains the user ID in this format
+            setUserId(data.user_id);  // Assuming user_id is returned in the response
+
+            console.log(`%cUSER'S ID IS: ${data.user_id}`, 'color: green; font-weight: bold;');
         } catch (error) {
             setError(`Error fetching user ID: ${error.message}`);
+            console.error(`Error fetching user ID: ${error.message}`);
         }
     };
+
+// Helper function to create a new user and re-fetch their user ID
+    const createUser = async (username) => {
+        try {
+            const response = await fetch(`http://localhost:8002/credits/initialize_user_credits/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,  // Use the correct username key
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to create new user: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            setUserId(data.user_id);  // Assuming the new user ID is returned in the response
+
+            console.log(`%cNew USER CREATED: ID = ${data.user_id}, Username = ${username}`, 'color: blue; font-weight: bold;');
+        } catch (error) {
+            setError(`Error creating new user: ${error.message}`);
+            console.error(`Error creating new user: ${error.message}`);
+        }
+    };
+
+
+
 
     const fetchCreditBalance = async (username) => {
         try {
@@ -90,13 +131,16 @@ function MySubmissions() {
 
     useEffect(() => {
         if (username) {
-            fetchUserId(username);
-            fetchCreditBalance(username);
-            fetchUserSubmissions(username);
+            console.log(`Fetching data for user: ${username}`);  // Add this to check if the effect runs
+            fetchUserId(username);  // Fetch or create user ID
+            fetchCreditBalance(username);  // Fetch user's credit balance
+            fetchUserSubmissions(username);  // Fetch user's submissions
         } else {
             console.error('Username is not defined');
         }
     }, [username]);
+
+
 
     const handleNewClick = () => {
         navigate('/NewSubmission', { state: { username: username } });
@@ -170,6 +214,40 @@ function MySubmissions() {
         }
     };
 
+    // Updated Logout Function with checks
+    const handleLogout = async () => {
+        navigate('/login');
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setError('No token found, cannot log out.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8000/logout/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Token ${token}`,  // Token format
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.status === 401) {
+                setError('Session has expired. Please log in again.');
+                localStorage.removeItem('token');
+                navigate('/login');
+            } else if (!response.ok) {
+                throw new Error('Failed to logout');
+            } else {
+                // Successful logout
+                localStorage.removeItem('token');
+                navigate('/login');
+            }
+        } catch (error) {
+            setError(`Error logging out: ${error.message}`);
+        }
+    };
+
     return (
         <div className="landing">
             <img src={logo2} alt="solveMe Logo" className="top-logo"/>
@@ -180,6 +258,10 @@ function MySubmissions() {
                 </div>
                 <div className="date-time-box">
                     {currentDateTime.toLocaleDateString()} {currentDateTime.toLocaleTimeString()}
+                </div>
+                {/* Add a Logout button */}
+                <div className="logout-button">
+                    <button onClick={handleLogout}>Logout</button>
                 </div>
             </div>
             <div className="credit-balance-box">
