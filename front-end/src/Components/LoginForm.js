@@ -50,6 +50,19 @@ function LoginForm() {
             localStorage.setItem('token', data.token);
             console.log('Stored token:', localStorage.getItem('token'));
 
+
+            // Call the API to initialize models
+            await fetch('http://localhost:8003/problem/initialize_models/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(() => {
+                console.log('Model initialization successful');
+            }).catch((error) => {
+                console.error('Model initialization failed:', error);
+            });
+
             // Redirect based on user type
             if (data.is_superuser) {
                 navigate('/allsubmissions', { state: { username: form.username } });
