@@ -24,9 +24,11 @@ function MySubmissions() {
         };
     }, []);
 
-    const fetchUserId = async (username) => {
-        console.log(`fetchUserId called for username: ${username}`);  // Log to ensure the function is called
 
+
+    const fetchUserId = async (username) => {
+        console.log(`fetchUserId called for username: ${username}`);
+    
         try {
             const response = await fetch(`http://localhost:8002/users/get_id_by_username/${username}/`, {
                 method: 'GET',
@@ -34,28 +36,31 @@ function MySubmissions() {
                     'Content-Type': 'application/json',
                 },
             });
-
+    
             if (response.status === 404) {
                 console.log(`User ${username} not found. Creating new user.`);
-                await createUser(username);  // Call the function to create a new user
+                const newUserId = await createUser(username);  // Create user first
+                
+                if (newUserId) {
+                    setUserId(newUserId);  // Set the new user ID
+                }
                 return;
             }
-
+    
             if (!response.ok) {
                 throw new Error(`Failed to fetch user ID: ${response.statusText}`);
             }
-
+    
             const data = await response.json();
             setUserId(data.user_id);  // Assuming user_id is returned in the response
-
+    
             console.log(`%cUSER'S ID IS: ${data.user_id}`, 'color: green; font-weight: bold;');
         } catch (error) {
             setError(`Error fetching user ID: ${error.message}`);
-            console.error(`Error fetching user ID: ${error.message}`);
         }
     };
+    
 
-// Helper function to create a new user and re-fetch their user ID
     const createUser = async (username) => {
         try {
             const response = await fetch(`http://localhost:8002/credits/initialize_user_credits/`, {
@@ -63,25 +68,24 @@ function MySubmissions() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    username: username,  // Use the correct username key
-                }),
+                body: JSON.stringify({ username }),  // Fixed the body to correctly use the username
             });
-
+    
             if (!response.ok) {
                 throw new Error(`Failed to create new user: ${response.statusText}`);
             }
-
+    
             const data = await response.json();
             setUserId(data.user_id);  // Assuming the new user ID is returned in the response
-
             console.log(`%cNew USER CREATED: ID = ${data.user_id}, Username = ${username}`, 'color: blue; font-weight: bold;');
+    
+            return data.user_id;  // Return the newly created user ID
         } catch (error) {
             setError(`Error creating new user: ${error.message}`);
-            console.error(`Error creating new user: ${error.message}`);
+            return null;
         }
     };
-
+    
 
 
 
@@ -131,14 +135,16 @@ function MySubmissions() {
 
     useEffect(() => {
         if (username) {
-            console.log(`Fetching data for user: ${username}`);  // Add this to check if the effect runs
-            fetchUserId(username);  // Fetch or create user ID
-            fetchCreditBalance(username);  // Fetch user's credit balance
-            fetchUserSubmissions(username);  // Fetch user's submissions
+            console.log(`Fetching data for user: ${username}`);
+            fetchUserId(username).then(() => {
+                fetchCreditBalance(username);  // Fetch user's credit balance
+                fetchUserSubmissions(username);  // Fetch user's submissions
+            });
         } else {
             console.error('Username is not defined');
         }
     }, [username]);
+    
 
 
 
