@@ -41,6 +41,7 @@ function SignUpForm() {
             console.log('Registration Success:', data);
             setSuccess('Registration successful! Please log in.');
             setError('');
+    
 
             setTimeout(() => {
                 navigate('/login');
