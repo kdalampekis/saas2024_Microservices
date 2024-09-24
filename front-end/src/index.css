@@ -531,3 +531,81 @@ label {
 }
 
 
+
+
+
+
+
+
+/* Styles for the JSON container */
+.json-container {
+  margin-top: 20px;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+/* JSON Renderer Styles */
+.json-item {
+  position: relative;
+}
+
+.json-collapsible {
+  cursor: pointer;
+  user-select: none;
+}
+
+.json-toggle {
+  display: inline-block;
+  width: 20px;
+}
+
+.json-key {
+  font-weight: bold;
+  color: #a71d5d;
+}
+
+.json-children {
+  margin-left: 20px;
+}
+
+.json-value {
+  margin-left: 5px;
+}
+
+.json-string {
+  color: #c0ccf0;
+}
+
+.json-number {
+  color: #c0ccf0;
+}
+
+.json-boolean {
+  color: #795da3;
+}
+
+.json-null {
+  color: #808080;
+}
+
+.json-primitive {
+  color: #000000;
+}
+
+/* Hover effect */
+.json-collapsible:hover .json-key {
+  text-decoration: underline;
+}
+
+/* Collapsible icon */
+.json-toggle {
+  font-weight: bold;
+  color: #a71d5d;
+}
+
+
+
+
+
+
+

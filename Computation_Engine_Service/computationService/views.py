@@ -162,6 +162,7 @@ def vrp_api(request):
             name = request.POST.get('name')
             end_time = time.time()
             duration = end_time - start_time
+            print(f"DEBUG: API Response Result: {result}")
             save_api_response(submission_id, name, result, duration)
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
@@ -207,6 +208,7 @@ def nqueens_api(request):
         submission_id = request.POST.get('submission_id')
         name = request.POST.get('name')
         save_api_response(submission_id, name, result, duration)
+        print(f"DEBUG: API Response Result: {result}")
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -242,6 +244,7 @@ def binpacking_api(request):
     duration = end_time - start_time
     submission_id = request.POST.get('submission_id')
     name = request.POST.get('name')
+    print(f"DEBUG: API Response Result: {result}")
     save_api_response(submission_id, name, result, duration)
     
     return Response(result, status=status.HTTP_200_OK)
@@ -271,7 +274,7 @@ def linear_programming_api(request):
         submission_id = request.POST.get('submission_id')
         name = request.POST.get('name')
         save_api_response(submission_id, name, result, duration)
-
+        print(f"DEBUG: API Response Result: {result}")
         return Response(result, status=status.HTTP_200_OK)
 
     except json.JSONDecodeError:
@@ -299,7 +302,7 @@ def job_shop_api(request):
         submission_id = request.POST.get('submission_id')
         name = request.POST.get('name')
         save_api_response(submission_id, name, result, duration)
-
+        print(f"DEBUG: API Response Result: {result}")
         return Response(result, status=status.HTTP_200_OK)
 
     except json.JSONDecodeError:
@@ -333,7 +336,7 @@ def mkp_api(request):
         name = request.POST.get('name')
         save_api_response(submission_id, name, result, duration)
 
-
+        print(f"DEBUG: API Response Result: {result}")
         return Response(result, status=status.HTTP_200_OK)
 
     except json.JSONDecodeError:
@@ -368,7 +371,7 @@ def max_flow_api(request):
         submission_id = request.POST.get('submission_id')
         name = request.POST.get('name')
         save_api_response(submission_id, name, result, duration)
-        
+        print(f"DEBUG: API Response Result: {result}")    
         return Response(result, status=status.HTTP_200_OK)
 
     except json.JSONDecodeError:
@@ -398,6 +401,8 @@ def lin_sum_assignment_api(request):
         submission_id = request.POST.get('submission_id')
         name = request.POST.get('name')
         save_api_response(submission_id, name, result, duration)
+        
+        print(f"DEBUG: API Response Result: {result}")
         return Response(result, status=status.HTTP_200_OK)
 
     except json.JSONDecodeError:

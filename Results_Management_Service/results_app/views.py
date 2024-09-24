@@ -27,6 +27,8 @@ def fetch_data(request, sub_id):  # Accept request and submission_id as argument
             'result_data': result_data,
         }
 
+        print(combined_data)
+
         return Response(combined_data)  # Directly return the combined JSON data
 
     except requests.exceptions.RequestException as e:

@@ -133,6 +133,44 @@ function MySubmissions() {
             setError(`Error submitting submission: ${error.message}`);
         }
     };
+    
+    const viewResults = async (submissionId) => {
+
+        navigate('/ViewSubmissionResults', { state: { username, submissionId } });
+
+        // try {
+        //     console.log(`DEBUG: Fetching results for submission ID: ${submissionId}`);
+            
+        //     const response = await fetch(`http://localhost:8005/get-results/${submissionId}/`, {
+        //         method: 'GET'
+        //     });
+    
+        //     // Debugging: Check if the response is ok
+        //     console.log(`DEBUG: Response status: ${response.status}`);
+            
+        //     if (!response.ok) {
+        //         throw new Error(`Failed to fetch results: ${response.statusText}`);
+        //     }
+    
+        //     // Parse the response JSON
+        //     const data = await response.json();
+        //     console.log("DEBUG: Data received from the API:", data);
+    
+        //     // Show the data in an alert pop-up window
+        //     alert(`Results: ${JSON.stringify(data)}`);
+    
+        //     // Optionally, return the data
+        //     return data;
+            
+        // } catch (error) {
+        //     // Debugging: Print error details
+        //     console.log(`DEBUG: Error occurred: ${error.message}`);
+        //     setError(`Error fetching results: ${error.message}`);
+        // }
+    };
+    
+    
+    
 
     const handleBuyCredits = async () => {
         try {
@@ -221,15 +259,24 @@ function MySubmissions() {
                             <td>
                                 <button
                                     onClick={() => {
-                                        if (window.confirm("Are you sure you want to run this submission?")) {
+                                        if (window.confirm("Are you sure you want to run this submission? **Updated**")) {
                                             runSubmission(submission.submission_id);
                                         }
-                                    }}>
-                                    Run
+                                    }}
+                                >
+                                Run
                                 </button>
                             </td>
                             <td>
-                                <button>View Results</button>
+                                <button
+                                onClick={() => {
+                                    if (window.confirm("Are you sure you want to see the results?")) {
+                                        viewResults(submission.submission_id);
+                                    }
+                                }}
+                                >
+                                View Results
+                                </button>
                             </td>
                             <td>
                                 <button className="delete-button"

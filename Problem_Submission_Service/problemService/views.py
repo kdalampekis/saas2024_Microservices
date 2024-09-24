@@ -135,7 +135,8 @@ def submit_problem(request, sub_id):
         # Change the status to 'not ready
         metadata.is_ready = False
         metadata.save()
-        
+        if (metadata.is_executed == True):
+            return Response("Problem already done")
         # Get the problem name, as written in the URL
         problem_name = metadata.model_id.name
         
